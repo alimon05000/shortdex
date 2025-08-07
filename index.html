@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shortdex - Create Viral Shorts from Any Video</title>
-    <meta name="description" content="Transform long videos into viral shorts with AI. Just paste a URL and get 10+ engaging clips ready for YouTube Shorts!">
+    <title>Shortdex - Создавайте вирусные Shorts из любого видео</title>
+    <meta name="description" content="Преобразуйте длинные видео в вирусные Shorts с помощью ИИ. Просто вставьте ссылку и получите 10+ готовых клипов для YouTube Shorts!">
+    <meta name="theme-color" content="#000000">
     <link rel="manifest" href="/manifest.webmanifest">
     <style>
         :root {
@@ -16,6 +17,10 @@
             --warning: #FDCB6E;
             --danger: #D63031;
             --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+            --dark-bg: #121212;
+            --dark-card: #1E1E1E;
+            --dark-text: #E0E0E0;
+            --dark-border: #333333;
         }
         
         * {
@@ -29,6 +34,12 @@
             background-color: var(--light);
             color: var(--dark);
             overflow-x: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        body.dark-theme {
+            background-color: var(--dark-bg);
+            color: var(--dark-text);
         }
         
         /* Animated Background */
@@ -44,6 +55,10 @@
             overflow: hidden;
         }
         
+        body.dark-theme .bg-animation {
+            opacity: 0.05;
+        }
+        
         .bg-animation span {
             position: absolute;
             display: block;
@@ -53,6 +68,10 @@
             border-radius: 50%;
             animation: animate 15s linear infinite;
             bottom: -150px;
+        }
+        
+        body.dark-theme .bg-animation span {
+            background: rgba(0, 0, 0, 0.2);
         }
         
         .bg-animation span:nth-child(1) {
@@ -131,16 +150,8 @@
         }
         
         @keyframes animate {
-            0% {
-                transform: translateY(0) rotate(0deg);
-                opacity: 1;
-                border-radius: 0;
-            }
-            100% {
-                transform: translateY(-1000px) rotate(720deg);
-                opacity: 0;
-                border-radius: 50%;
-            }
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; border-radius: 0; }
+            100% { transform: translateY(-1000px) rotate(720deg); opacity: 0; border-radius: 50%; }
         }
         
         /* Main Container */
@@ -195,6 +206,10 @@
             position: relative;
         }
         
+        body.dark-theme nav a {
+            color: var(--dark-text);
+        }
+        
         nav a:hover {
             color: var(--primary);
         }
@@ -231,6 +246,19 @@
             box-shadow: 0 6px 20px rgba(108, 92, 231, 0.4);
         }
         
+        .theme-toggle {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--dark);
+            margin-left: 15px;
+        }
+        
+        body.dark-theme .theme-toggle {
+            color: var(--dark-text);
+        }
+        
         /* Hero Section */
         .hero {
             display: flex;
@@ -262,6 +290,10 @@
             max-width: 600px;
         }
         
+        body.dark-theme .hero p {
+            color: #aaa;
+        }
+        
         /* URL Input Section */
         .url-input {
             width: 100%;
@@ -279,8 +311,17 @@
             transition: all 0.3s ease;
         }
         
+        body.dark-theme .url-input-container {
+            background: var(--dark-card);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
         .url-input-container:focus-within {
             box-shadow: 0 15px 40px rgba(108, 92, 231, 0.2);
+        }
+        
+        body.dark-theme .url-input-container:focus-within {
+            box-shadow: 0 15px 40px rgba(108, 92, 231, 0.4);
         }
         
         .url-input-container input {
@@ -290,6 +331,13 @@
             border-radius: 50px 0 0 50px;
             font-size: 16px;
             outline: none;
+            background: white;
+            color: var(--dark);
+        }
+        
+        body.dark-theme .url-input-container input {
+            background: var(--dark-card);
+            color: var(--dark-text);
         }
         
         .url-input-container button {
@@ -326,6 +374,11 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         }
         
+        body.dark-theme .platform {
+            background: rgba(30, 30, 30, 0.7);
+            color: var(--dark-text);
+        }
+        
         .platform img {
             width: 20px;
             height: 20px;
@@ -354,6 +407,10 @@
             margin: 0 auto;
         }
         
+        body.dark-theme .section-title p {
+            color: #aaa;
+        }
+        
         .features-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -368,9 +425,18 @@
             transition: all 0.3s ease;
         }
         
+        body.dark-theme .feature-card {
+            background: var(--dark-card);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+        
         .feature-card:hover {
             transform: translateY(-10px);
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        body.dark-theme .feature-card:hover {
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
         }
         
         .feature-icon {
@@ -395,9 +461,17 @@
             font-weight: 700;
         }
         
+        body.dark-theme .feature-card h4 {
+            color: var(--dark-text);
+        }
+        
         .feature-card p {
             color: #666;
             line-height: 1.6;
+        }
+        
+        body.dark-theme .feature-card p {
+            color: #aaa;
         }
         
         /* How It Works Section */
@@ -425,6 +499,11 @@
             z-index: 1;
         }
         
+        body.dark-theme .step {
+            background: var(--dark-card);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+        
         .step-number {
             width: 50px;
             height: 50px;
@@ -444,8 +523,16 @@
             margin-bottom: 15px;
         }
         
+        body.dark-theme .step h4 {
+            color: var(--dark-text);
+        }
+        
         .step p {
             color: #666;
+        }
+        
+        body.dark-theme .step p {
+            color: #aaa;
         }
         
         .steps::before {
@@ -478,9 +565,18 @@
             transition: all 0.3s ease;
         }
         
+        body.dark-theme .result-card {
+            background: var(--dark-card);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
         .result-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        body.dark-theme .result-card:hover {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
         }
         
         .result-thumbnail {
@@ -488,6 +584,10 @@
             background: #eee;
             position: relative;
             overflow: hidden;
+        }
+        
+        body.dark-theme .result-thumbnail {
+            background: #333;
         }
         
         .result-thumbnail img {
@@ -505,10 +605,18 @@
             font-size: 18px;
         }
         
+        body.dark-theme .result-info h4 {
+            color: var(--dark-text);
+        }
+        
         .result-info p {
             color: #666;
             font-size: 14px;
             margin-bottom: 15px;
+        }
+        
+        body.dark-theme .result-info p {
+            color: #aaa;
         }
         
         .result-actions {
@@ -535,6 +643,12 @@
             background: white;
             color: var(--primary);
             border: 1px solid var(--primary);
+        }
+        
+        body.dark-theme .result-actions .secondary {
+            background: var(--dark-card);
+            color: var(--primary);
+            border-color: var(--primary);
         }
         
         /* CTA Section */
@@ -584,6 +698,10 @@
             background: var(--dark);
             color: white;
             padding: 60px 0 30px;
+        }
+        
+        body.dark-theme footer {
+            background: #111;
         }
         
         .footer-content {
@@ -637,6 +755,47 @@
             font-size: 14px;
         }
         
+        /* Telegram Bot Section */
+        .telegram-bot {
+            background: #0088cc;
+            color: white;
+            padding: 40px;
+            border-radius: 20px;
+            margin-bottom: 80px;
+            text-align: center;
+        }
+        
+        .telegram-bot h3 {
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+        
+        .telegram-bot p {
+            font-size: 18px;
+            margin-bottom: 30px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .telegram-bot .bot-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            color: #0088cc;
+            padding: 15px 25px;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .telegram-bot .bot-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
         /* Mobile Menu */
         .mobile-menu-btn {
             display: none;
@@ -645,6 +804,10 @@
             font-size: 24px;
             color: var(--dark);
             cursor: pointer;
+        }
+        
+        body.dark-theme .mobile-menu-btn {
+            color: var(--dark-text);
         }
         
         /* PWA Install Prompt */
@@ -662,6 +825,11 @@
             z-index: 1000;
             transform: translateY(150%);
             transition: transform 0.3s ease;
+        }
+        
+        body.dark-theme .pwa-install-prompt {
+            background: var(--dark-card);
+            color: var(--dark-text);
         }
         
         .pwa-install-prompt.show {
@@ -688,6 +856,11 @@
             color: var(--dark);
         }
         
+        body.dark-theme .pwa-install-prompt button.secondary {
+            background: #333;
+            color: var(--dark-text);
+        }
+        
         /* Loading Animation */
         .loading-overlay {
             position: fixed;
@@ -706,6 +879,10 @@
             transition: opacity 0.3s ease;
         }
         
+        body.dark-theme .loading-overlay {
+            background: rgba(0, 0, 0, 0.9);
+        }
+        
         .loading-overlay.active {
             opacity: 1;
             pointer-events: all;
@@ -719,6 +896,19 @@
             border-radius: 50%;
             animation: spin 1s linear infinite;
             margin-bottom: 20px;
+        }
+        
+        body.dark-theme .loading-spinner {
+            border-color: #333;
+        }
+        
+        .loading-overlay p {
+            color: var(--dark);
+            font-size: 18px;
+        }
+        
+        body.dark-theme .loading-overlay p {
+            color: var(--dark-text);
         }
         
         @keyframes spin {
@@ -767,6 +957,10 @@
                 box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             }
             
+            body.dark-theme .url-input-container input {
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            }
+            
             .url-input-container button {
                 border-radius: 50px;
                 padding: 15px;
@@ -789,6 +983,10 @@
                 padding: 80px 30px;
             }
             
+            body.dark-theme nav {
+                background: var(--dark-card);
+            }
+            
             nav.active {
                 right: 0;
             }
@@ -806,6 +1004,11 @@
                 border: none;
                 font-size: 24px;
                 cursor: pointer;
+                color: var(--dark);
+            }
+            
+            body.dark-theme .close-menu-btn {
+                color: var(--dark-text);
             }
         }
         
@@ -868,25 +1071,28 @@
             <nav id="mainNav">
                 <button class="close-menu-btn" id="closeMenuBtn">×</button>
                 <ul>
-                    <li><a href="#features">Features</a></li>
-                    <li><a href="#how-it-works">How It Works</a></li>
-                    <li><a href="#results">Results</a></li>
-                    <li><a href="#pricing">Pricing</a></li>
+                    <li><a href="#features">Возможности</a></li>
+                    <li><a href="#how-it-works">Как это работает</a></li>
+                    <li><a href="#results">Результаты</a></li>
+                    <li><a href="#pricing">Цены</a></li>
                 </ul>
             </nav>
             
-            <button class="cta-button" id="installBtn">Install App</button>
+            <div style="display: flex; align-items: center;">
+                <button class="cta-button" id="installBtn">Установить</button>
+                <button class="theme-toggle" id="themeToggle">🌓</button>
+            </div>
         </header>
         
         <!-- Hero Section -->
         <section class="hero">
-            <h2 class="slide-up">Transform <span>Long Videos</span> into <span>Viral Shorts</span></h2>
-            <p class="slide-up">Paste a YouTube link and our AI will create 10+ engaging short clips with subtitles, ready to go viral on YouTube Shorts!</p>
+            <h2 class="slide-up">Превратите <span>длинные видео</span> в <span>вирусные Shorts</span></h2>
+            <p class="slide-up">Вставьте ссылку на YouTube, и наш ИИ создаст 10+ увлекательных коротких клипов с субтитрами, готовых стать вирусными в YouTube Shorts!</p>
             
             <div class="url-input slide-up">
                 <div class="url-input-container">
-                    <input type="text" id="videoUrl" placeholder="Paste YouTube video URL here...">
-                    <button id="processBtn">Create Shorts</button>
+                    <input type="text" id="videoUrl" placeholder="Вставьте ссылку на YouTube видео...">
+                    <button id="processBtn">Создать Shorts</button>
                 </div>
                 <div class="supported-platforms">
                     <div class="platform">
@@ -894,7 +1100,7 @@
                         YouTube
                     </div>
                     <div class="platform">
-                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzAwQjBGRiIgZD0iTTE5LjYxNSAzLjE4OEMxNS45NjIuMTkzIDEyLjI5LjEwMiA4LjY2MyAyLjY0NmMtMS4xMjkuODU0LTIuMDYgMS44OTktMi45MjkgMy4wMzctLjg2OSAxLjEzNy0xLjUxOCAyLjM2LTIuMDI0IDMuNzA5LS41MDYgMS4zNS0uODQgMi43NzktMS4wMTcgNC4yNzQtLjE3NyAxLjQ5NS0uMTk4IDMuMDM1LS4wNjIgNC42MjIuMTM1IDEuNTg3LjQzOCAzLjIxLjkxIDQuODc1LjQ3MiAxLjY2NSAxLjA4IDMuMzQ0IDEuODI3IDUuMDY3Ljc0NyAxLjcxMyAxLjY0IDMuNDE0IDIuNjg1IDUuMTAzIDEuMDQ1IDEuNjkgMi4yMjMgMy4zNDcgMy41MzMgNC45NzMgMS4zMSAxLjYyNiAyLjc3IDMuMTg5IDQuMzgxIDQuLjgwNS40NTkgMS43MzEuNjg5IDIuNzU4LjY4OSAxLjAyOCAwIDIuMDkzLS4yMyAzLjE5Ni0uNjkgMS4xMDMtLjQ2IDIuMTMtMS4xNTIgMy4wODItMi4wNzUuOTUyLS45MjMgMS43MTgtMi4wMzQgMi4yOTgtMy4zMzIuNTgtMS4yOTkuODctMi43MzYuODctNC4zMSAwLTEuNTc0LS4yOTYtMy4yNTItLjg4OC00Ljg1LS41OTItMS41OTgtMS40MzktMy4wNzctMi41NDItNC40MzYtMS4xMDMtMS4zNi0yLjQ1Ni0yLjU4My00LjA2LTMuNjctMS42MDUtMS4wODctMy40MjYtMS45OTQtNS40NjMtMi43MjItMi4wMzctLjcyOC00LjI0Mi0xLjI4OS02LjYxNS0xLjY4My0yLjM3My0uMzk0LTQuODQyLS42MzYtNy40MDgtLjcyNS0yLjU2Ni0uMDktNS4xNjYuMDM1LTcuODAxLjM3My0yLjYzNS4zMzgtNS4yMTcuODk3LTcuNzQ2IDEuNjgxLTIuNTI5Ljc4NC00Ljg5OCAxLjgxLTcuMTA4IDMuMDc4LTIuMjEuMS4wMDQtNC4zOTktMi4wMDItNi41NzktMy4wMDZ6Ii8+PC9zdmc+" alt="TikTok">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzAwQjBGRiIgZD0iTTE5LjYxNSAzLjE4OEMxNS45NjIuMTkzIDEyLjI5LjEwMiA4LjY2MyAyLjY0NmMtMS4xMjkuODU0LTIuMDYgMS44OTktMi45MjkgMy4wMzctLjg2OSAxLjEzNy0xLjUxOCAyLjM2LTIuMDI0IDMuNzA5LS41MDYgMS4zNS0uODQgMi43NzktMS4wMTcgNC4yNzQtLjE3NyAxLjQ5NS0uMTk4IDMuMDM1LS4wNjIgNC42MjIuMTM1IDEuNTg3LjQzOCAzLjIxLjkxIDQuODc1LjQ3MiAxLjY2NSAxLjA4IDMuMzQ0IDEuODI3IDUuMDY3Ljc0NyAxLjcxMyAxLjY0IDMuNDE0IDIuNjg1IDUuMTAzIDEuMDQ1IDEuNjkgMi4yMjMgMy4zNDcgMy41MzMgNC45NzMgMS4zMSAxLjYyNiAyLjc3IDMuMTg5IDQuMzgxIDQuLjgwNS40NTkgMS43MzEuNjg5IDIuNzU4LjY4OSAxLjAyOCAwIDIuMDkzLS4yMyAzLjE5Ni0uNjkgMS4xMDMtLjQ2IDIuMTMtMS4xNTIgMy4wODItMi4wNzUuOTUyLS5yMzIgMS43MTgtMi4wMzQgMi4yOTgtMy4zMzIuNTgtMS4yOTkuODctMi43MzYuODctNC4zMSAwLTEuNTc0LS4yOTYtMy4yNTItLjg4OC00Ljg1LS41OTItMS41OTgtMS40MzktMy4wNzctMi41NDItNC40MzYtMS4xMDMtMS4zNi0yLjQ1Ni0yLjU4My00LjA2LTMuNjctMS42MDUtMS4wODctMy40MjYtMS45OTQtNS40NjMtMi43MjItMi4wMzctLjcyOC00LjI0Mi0xLjI4OS02LjYxNS0xLjY4My0yLjM3My0uMzk0LTQuODQyLS42MzYtNy40MDgtLjcyNS0yLjU2Ni0uMDktNS4xNjYuMDM1LTcuODAxLjM3My0yLjYzNS4zMzgtNS4yMTcuODk3LTcuNzQ2IDEuNjgxLTIuNTI5Ljc4NC00Ljg5OCAxLjgxLTcuMTA4IDMuMDc4LTIuMjEuMS4wMDQtNC4zOTktMi4wMDItNi41NzktMy4wMDZ6Ii8+PC9zdmc+" alt="TikTok">
                         TikTok
                     </div>
                     <div class="platform">
@@ -902,18 +1108,28 @@
                         Instagram
                     </div>
                     <div class="platform">
-                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzAwQjBGRiIgZD0iTTE5LjYxNSAzLjE4OEMxNS45NjIuMTkzIDEyLjI5LjEwMiA4LjY2MyAyLjY0NmMtMS4xMjkuODU0LTIuMDYgMS44OTktMi45MjkgMy4wMzctLjg2OSAxLjEzNy0xLjUxOCAyLjM2LTIuMDI0IDMuNzA5LS41MDYgMS4zNS0uODQgMi43NzktMS4wMTcgNC4yNzQtLjE3NyAxLjQ5NS0uMTk4IDMuMDM1LS4wNjIgNC42MjIuMTM1IDEuNTg3LjQzOCAzLjIxLjkxIDQuODc1LjQ3MiAxLjY2NSAxLjA4IDMuMzQ0IDEuODI3IDUuMDY3Ljc0NyAxLjcxMyAxLjY0IDMuNDE0IDIuNjg1IDUuMTAzIDEuMDQ1IDEuNjkgMi4yMjMgMy4zNDcgMy41MzMgNC45NzMgMS4zMSAxLjYyNiAyLjc3IDMuMTg5IDQuMzgxIDQuLjgwNS40NTkgMS43MzEuNjg5IDIuNzU4LjY4OSAxLjAyOCAwIDIuMDkzLS4yMyAzLjE5Ni0uNjkgMS4xMDMtLjQ2IDIuMTMtMS4xNTIgMy4wODItMi4wNzUuOTUyLS45MjMgMS43MTgtMi4wMzQgMi4yOTgtMy4zMzIuNTgtMS4yOTkuODctMi43MzYuODctNC4zMSAwLTEuNTc0LS4yOTYtMy4yNTItLjg4OC00Ljg1LS41OTItMS41OTgtMS40MzktMy4wNzctMi41NDItNC40MzYtMS4xMDMtMS4zNi0yLjQ1Ni0yLjU4My00LjA2LTMuNjctMS42MDUtMS4wODctMy40MjYtMS45OTQtNS40NjMtMi43MjItMi4wMzctLjcyOC00LjI0Mi0xLjI4OS02LjYxNS0xLjY4My0yLjM3My0uMzk0LTQuODQyLS42MzYtNy40MDgtLjcyNS0yLjU2Ni0uMDktNS4xNjYuMDM1LTcuODAxLjM3My0yLjYzNS4zMzgtNS4yMTcuODk3LTcuNzQ2IDEuNjgxLTIuNTI5Ljc4NC00Ljg5OCAxLjgxLTcuMTA4IDMuMDc4LTIuMjEuMS4wMDQtNC4zOTktMi4wMDItNi41NzktMy4wMDZ6Ii8+PC9zdmc+" alt="Facebook">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzAwQjBGRiIgZD0iTTE5LjYxNSAzLjE4OEMxNS45NjIuMTkzIDEyLjI5LjEwMiA4LjY2MyAyLjY0NmMtMS4xMjkuODU0LTIuMDYgMS44OTktMi45MjkgMy4wMzctLjg2OSAxLjEzNy0xLjUxOCAyLjM2LTIuMDI0IDMuNzA5LS41MDYgMS4zNS0uODQgMi43NzktMS4wMTcgNC4yNzQtLjE3NyAxLjQ5NS0uMTk4IDMuMDM1LS4wNjIgNC42MjIuMTM1IDEuNTg3LjQzOCAzLjIxLjkxIDQuODc1LjQ3MiAxLjY2NSAxLjA4IDMuMzQ0IDEuODI3IDUuMDY3Ljc0NyAxLjcxMyAxLjY0IDMuNDE0IDIuNjg1IDUuMTAzIDEuMDQ1IDEuNjkgMi4yMjMgMy4zNDcgMy41MzMgNC45NzMgMS4zMSAxLjYyNiAyLjc3IDMuMTg5IDQuMzgxIDQuLjgwNS40NTkgMS43MzEuNjg5IDIuNzU4LjY4OSAxLjAyOCAwIDIuMDkzLS4yMyAzLjE5Ni0uNjkgMS4xMDMtLjQ2IDIuMTMtMS4xNTIgMy4wODItMi4wNzUuOTUyLS45MjMgMS43MTgtMi4wMzQgMi4yOTgtMy4zMzIuNTgtMS4yOTkuODctMi43MzYuODctNC4zMSAwLTEuNTc0LS4yOTYtMy4yNTItLjg4OC00Ljg1LS41OTItMS41OTgtMS40MzktMy4wNzctMi41NDItNC40MzYtMS4xMDMtMS4zNi0yLjQ1Ni0yLjU4My00LjA2LTMuNjctMS42MDUtMS4wODctMy40MjYt1Ljk5NC01LjQ2My0yLjcyMi0yLjAzNy0uNzI4LTQuMjQyLTEuMjg5LTYuNjE1LTEuNjgzLTIuMzczLS4zOTQtNC44NDItLjYzNi03LjQwOC0uNzI1LTIuNTY2LS4wOS01LjE2Ni4wMzUtNy44MDEuMzczLTIuNjM1LjMzOC01LjIxNy44OTctNy43NDYgMS42ODEtMi41MjkuNzg0LTQuODk4IDEuODEtNy4xMDggMy4wNzgtMi4yMS4xLjAwNC00LjM5OS0yLjAwMi02LjU3OS0zLjAwNnoiLz48L3N2Zz4=" alt="Facebook">
                         Facebook
                     </div>
                 </div>
             </div>
         </section>
         
+        <!-- Telegram Bot Section -->
+        <section class="telegram-bot">
+            <h3>Наш Telegram бот</h3>
+            <p>Используйте нашего бота для быстрого создания Shorts прямо в Telegram! Просто отправьте ссылку на видео и получите готовые клипы.</p>
+            <a href="https://t.me/shortdex_bot" class="bot-link" target="_blank">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzAwODhjYyIgZD0iTTkuNzgsMTguNjVMMTAuMDYsMTQuNTZMMTcuNzQsNy44NkMxOC4wOCw3LjUzIDE3LjY3LDcuMzkgMTcuLjIyLDcuNjZMNy43NCwxMy4zTDQuMTIsMTIuMTVDMy4yLDEyLjA0IDMuMTUsMTEuMDkgNC4xLDEwLjcxTDE5LjI3LDQuMTlDMTkuOTQsMy44NyAyMC42OSw0LjM1IDE5LjY2LDYuMjhMMTguNjYsOC4yNEwxNi41LDE1LjQyQzE2LjI2LDE2LjI3IDE1LjUsMTYuNDEgMTQuODcsMTYuMDhMMTEuNzYsMTMuODhMOSNzLDE4LjY1QzguODksMTkuMzkgOC4xMSwxOS42NSA3LjQ0LDE5LjE5QzYuNzYsMTguNzIgNi43MiwxNy44MyA3LjM4LDE3LjM1TDkuNzgsMTguNjVWMTguNjVaIi8+PC9zdmc+" alt="Telegram" width="20">
+                @ShortdexBot
+            </a>
+        </section>
+        
         <!-- Features Section -->
         <section class="features" id="features">
             <div class="section-title">
-                <h3 class="slide-up">AI-Powered Video Magic</h3>
-                <p class="slide-up">Our advanced algorithms do all the heavy lifting to create perfect short clips</p>
+                <h3 class="slide-up">Мощные возможности ИИ</h3>
+                <p class="slide-up">Наши продвинутые алгоритмы делают всю работу по созданию идеальных коротких клипов</p>
             </div>
             
             <div class="features-grid">
@@ -921,24 +1137,24 @@
                     <div class="feature-icon">
                         <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xMiAxNUMxMy42NiAxNSAxNS4xMyAxNi4zNSAxNS43NCAxOEg4LjI2QzguODcgMTYuMzUgMTAuMzQgMTUgMTIgMTVNOSAxM0M5IDEyLjQ1IDkuNDUgMTIgMTAgMTJDMTEuNjYgMTIgMTMgMTAuNjYgMTMgOUMxMyA3LjM0IDExLjY2IDYgMTAgNkM5LjQ1IDYgOSA2LjQ1IDkgN0M5IDcuNTUgOS40NSA4IDEwIDhDMTAuNTUgOCAxMSA3LjU1IDExIDdDMTEgOC4xIDEwLjEgOSAxMCA5QzkuOSA5IDkgOC4xIDkgN0M5IDUuMjcgMTAuMjcgNCAxMiA0QzEzLjczIDQgMTUgNS4yNyAxNSA3QzE1IDguNzMgMTMuNzMgMTAgMTIgMTBDMTEuNDUgMTAgMTEgMTAuNDUgMTEgMTFDMTEgMTEuNTUgMTEuNDUgMTIgMTIgMTJDMTIuNTUgMTIgMTMgMTEuNTUgMTMgMTFDMTMgMTIuNjYgMTEuNjYgMTQgMTAgMTRDOC4zNCAxNCA3IDEyLjY2IDcgMTFDNyA5LjM0IDguMzQgOCAxMCA4QzEwLjE5IDggMTAuMzcgOC4wNCAxMC41MyA4LjA5QzkuNzIgOC4yNCA5IDEzIDkgMTNIN0wxMiAxOUwxNyAxM0gxNUMxNSAxMyAxNC4yOCA4LjI0IDEzLjQ3IDguMDlDMTMuNjMgOC4wNCAxMy44MSA4IDE0IDhDMTUuNjYgOCAxNyA5LjM0IDE3IDExQzE3IDEyLjY2IDE1LjY2IDE0IDE0IDE0QzEzLjQ1IDE0IDEzIDEzLjU1IDEzIDEzQzEzIDEyLjQ1IDEzLjQ1IDEyIDE0IDEyQzE0LjU1IDEyIDE1IDEyLjQ1IDE1IDEzQzE1IDE0LjczIDEzLjczIDE2IDEyIDE2QzEwLjI3IDE2IDkgMTQuNzMgOSAxM1oiLz48L3N2Zz4=" alt="Language Detection">
                     </div>
-                    <h4>Auto Language Detection</h4>
-                    <p>Our AI automatically detects the language in your video and generates accurate subtitles in the same language or any other language you choose.</p>
+                    <h4>Автоопределение языка</h4>
+                    <p>Наш ИИ автоматически определяет язык в вашем видео и генерирует точные субтитры на том же языке или любом другом языке, который вы выберете.</p>
                 </div>
                 
                 <div class="feature-card fade-in" style="animation-delay: 0.2s;">
                     <div class="feature-icon">
                         <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xOCA5VjVIMTZWM0g4VjVINlY5SDJWMjFIMjJWOUgxOE0xNiA5SDEwVjVIMTZWOU0yMCAxOVYxMUg0VjE5SDIwWiIvPjwvc3ZnPg==" alt="Clip Creation">
                     </div>
-                    <h4>Smart Clip Creation</h4>
-                    <p>From a 30-minute video, we identify and extract the 10 most engaging moments that are perfect for Shorts/Reels/TikToks.</p>
+                    <h4>Умное создание клипов</h4>
+                    <p>Из 30-минутного видео мы выделяем и извлекаем 10 самых захватывающих моментов, которые идеально подходят для Shorts/Reels/TikTok.</p>
                 </div>
                 
                 <div class="feature-card fade-in" style="animation-delay: 0.4s;">
                     <div class="feature-icon">
-                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xOSAxM1YxOUg1VjVIMTFWMEgNVjNVNUgzVjIxSDE5VjE5SDIxVjEzSDE5TTE0IDBWMTJMMTcgOUwyMCAxMkwxMiAyMEw4LjY3IDE2LjY3TDUgMjAuNVYxNkwxMSAxMkw4LjY3IDkuNjZMMTQgMFoiLz48L3N2Zz4=" alt="Viral Optimization">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xOSAxM1YxOUg1VjVIMTFWMUgNVYzSDNWMjFIMTlWMTlIMjFWMTNIMTlNMTQgMFYxMkwxNyA5TDIwIDEyTDEyIDIwTDguNjcgMTYuNjdMNSUyMC41VjE2TDExIDEyTDguNjcgOS42NkwxNCAwWiIvPjwvc3ZnPg==" alt="Viral Optimization">
                     </div>
-                    <h4>Viral Optimization</h4>
-                    <p>Each clip is optimized with perfect timing, captions, and effects to maximize engagement and sharing potential.</p>
+                    <h4>Оптимизация для виральности</h4>
+                    <p>Каждый клип оптимизирован с идеальным таймингом, субтитрами и эффектами для максимального вовлечения и потенциала распространения.</p>
                 </div>
             </div>
         </section>
@@ -946,27 +1162,27 @@
         <!-- How It Works Section -->
         <section class="how-it-works" id="how-it-works">
             <div class="section-title">
-                <h3 class="slide-up">How Shortdex Works</h3>
-                <p class="slide-up">Create viral-ready shorts in just 3 simple steps</p>
+                <h3 class="slide-up">Как работает Shortdex</h3>
+                <p class="slide-up">Создавайте вирусные Shorts всего за 3 простых шага</p>
             </div>
             
             <div class="steps">
                 <div class="step slide-up">
                     <div class="step-number">1</div>
-                    <h4>Paste Video URL</h4>
-                    <p>Copy and paste the link to any YouTube video you want to convert into shorts.</p>
+                    <h4>Вставьте ссылку на видео</h4>
+                    <p>Скопируйте и вставьте ссылку на любое YouTube видео, которое вы хотите преобразовать в Shorts.</p>
                 </div>
                 
                 <div class="step slide-up" style="animation-delay: 0.2s;">
                     <div class="step-number">2</div>
-                    <h4>AI Processes Video</h4>
-                    <p>Our AI analyzes the video, detects key moments, and generates perfect clips.</p>
+                    <h4>ИИ обрабатывает видео</h4>
+                    <p>Наш ИИ анализирует видео, находит ключевые моменты и создает идеальные клипы.</p>
                 </div>
                 
                 <div class="step slide-up" style="animation-delay: 0.4s;">
                     <div class="step-number">3</div>
-                    <h4>Download & Share</h4>
-                    <p>Download your ready-to-post shorts or share them directly to social media.</p>
+                    <h4>Скачивайте и делитесь</h4>
+                    <p>Скачайте готовые к публикации Shorts или поделитесь ими напрямую в социальных сетях.</p>
                 </div>
             </div>
         </section>
@@ -974,8 +1190,8 @@
         <!-- Results Preview -->
         <section class="results-preview" id="results">
             <div class="section-title">
-                <h3 class="slide-up">Your Viral Shorts Await</h3>
-                <p class="slide-up">Here's what our AI can create from your videos</p>
+                <h3 class="slide-up">Ваши вирусные Shorts готовы</h3>
+                <p class="slide-up">Вот что наш ИИ может создать из ваших видео</p>
             </div>
             
             <div class="results-container">
@@ -984,11 +1200,11 @@
                         <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iI2VlZSIgZD0iTTE5IDNINUMzLjkgMyAzIDMuOSAzIDV2MTRjMCAxLjEgLjkgMiAyIDJoMTRjMS4xIDAgMi0uOSAyLTJWNWMwLTEuMS0uOS0yLTItMnoiLz48cGF0aCBmaWxsPSIjY2NjIiBkPSJNMTAgMTZsNS01LTMtMy01IDV6Ii8+PC9zdmc+" alt="Result Preview">
                     </div>
                     <div class="result-info">
-                        <h4>The Shocking Truth Revealed</h4>
-                        <p>0:15 • English • 1080p</p>
+                        <h4>Шокирующая правда раскрыта</h4>
+                        <p>0:15 • Русский • 1080p</p>
                         <div class="result-actions">
-                            <button>Download</button>
-                            <button class="secondary">Edit</button>
+                            <button>Скачать</button>
+                            <button class="secondary">Редактировать</button>
                         </div>
                     </div>
                 </div>
@@ -998,11 +1214,11 @@
                         <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iI2VlZSIgZD0iTTE5IDNINUMzLjkgMyAzIDMuOSAzIDV2MTRjMCAxLjEgLjkgMiAyIDJoMTRjMS4xIDAgMi0uOSAyLTJWNWMwLTEuMS0uOS0yLTItMnoiLz48cGF0aCBmaWxsPSIjY2NjIiBkPSJNMTAgMTZsNS01LTMtMy01IDV6Ii8+PC9zdmc+" alt="Result Preview">
                     </div>
                     <div class="result-info">
-                        <h4>You Won't Believe This</h4>
-                        <p>0:12 • English • 1080p</p>
+                        <h4>Вы не поверите в это</h4>
+                        <p>0:12 • Русский • 1080p</p>
                         <div class="result-actions">
-                            <button>Download</button>
-                            <button class="secondary">Edit</button>
+                            <button>Скачать</button>
+                            <button class="secondary">Редактировать</button>
                         </div>
                     </div>
                 </div>
@@ -1012,11 +1228,11 @@
                         <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iI2VlZSIgZD0iTTE5IDNINUMzLjkgMyAzIDMuOSAzIDV2MTRjMCAxLjEgLjkgMiAyIDJoMTRjMS4xIDAgMi0uOSAyLTJWNWMwLTEuMS0uOS0yLTItMnoiLz48cGF0aCBmaWxsPSIjY2NjIiBkPSJNMTAgMTZsNS01LTMtMy01IDV6Ii8+PC9zdmc+" alt="Result Preview">
                     </div>
                     <div class="result-info">
-                        <h4>This Changed Everything</h4>
-                        <p>0:18 • English • 1080p</p>
+                        <h4>Это изменит всё</h4>
+                        <p>0:18 • Русский • 1080p</p>
                         <div class="result-actions">
-                            <button>Download</button>
-                            <button class="secondary">Edit</button>
+                            <button>Скачать</button>
+                            <button class="secondary">Редактировать</button>
                         </div>
                     </div>
                 </div>
@@ -1025,9 +1241,9 @@
         
         <!-- CTA Section -->
         <section class="cta-section pulse">
-            <h3>Ready to Go Viral?</h3>
-            <p>Start creating attention-grabbing shorts from any video in seconds. No editing skills required!</p>
-            <button id="mainCtaBtn">Create Shorts Now</button>
+            <h3>Готовы стать вирусными?</h3>
+            <p>Начните создавать привлекающие внимание Shorts из любого видео за секунды. Никаких навыков редактирования не требуется!</p>
+            <button id="mainCtaBtn">Создать Shorts сейчас</button>
         </section>
     </div>
     
@@ -1038,58 +1254,58 @@
                 <div class="footer-column">
                     <h4>Shortdex</h4>
                     <ul>
-                        <li><a href="#">About Us</a></li>
-                        <li><a href="#">Careers</a></li>
-                        <li><a href="#">Press</a></li>
-                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">О нас</a></li>
+                        <li><a href="#">Карьера</a></li>
+                        <li><a href="#">Пресса</a></li>
+                        <li><a href="#">Блог</a></li>
                     </ul>
                 </div>
                 
                 <div class="footer-column">
-                    <h4>Product</h4>
+                    <h4>Продукт</h4>
                     <ul>
-                        <li><a href="#">Features</a></li>
-                        <li><a href="#">Pricing</a></li>
+                        <li><a href="#">Возможности</a></li>
+                        <li><a href="#">Цены</a></li>
                         <li><a href="#">API</a></li>
-                        <li><a href="#">Integrations</a></li>
+                        <li><a href="#">Интеграции</a></li>
                     </ul>
                 </div>
                 
                 <div class="footer-column">
-                    <h4>Resources</h4>
+                    <h4>Ресурсы</h4>
                     <ul>
-                        <li><a href="#">Help Center</a></li>
-                        <li><a href="#">Tutorials</a></li>
-                        <li><a href="#">Community</a></li>
-                        <li><a href="#">Webinars</a></li>
+                        <li><a href="#">Центр помощи</a></li>
+                        <li><a href="#">Обучение</a></li>
+                        <li><a href="#">Сообщество</a></li>
+                        <li><a href="#">Вебинары</a></li>
                     </ul>
                 </div>
                 
                 <div class="footer-column">
-                    <h4>Legal</h4>
+                    <h4>Правовая информация</h4>
                     <ul>
-                        <li><a href="#">Privacy</a></li>
-                        <li><a href="#">Terms</a></li>
-                        <li><a href="#">Cookie Policy</a></li>
+                        <li><a href="#">Конфиденциальность</a></li>
+                        <li><a href="#">Условия</a></li>
+                        <li><a href="#">Политика cookies</a></li>
                         <li><a href="#">GDPR</a></li>
                     </ul>
                 </div>
             </div>
             
             <div class="footer-bottom">
-                <p>&copy; 2023 Shortdex. All rights reserved.</p>
+                <p>&copy; 2023 Shortdex. Все права защищены.</p>
             </div>
         </div>
     </footer>
     
     <!-- PWA Install Prompt -->
     <div class="pwa-install-prompt" id="pwaInstallPrompt">
-        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTE5LjYxNSAzLjE4OEMxNS45NjIuMTkzIDEyLjI5LjEwMiA4LjY2MyAyLjY0NmMtMS4xMjkuODU0LTIuMDYgMS44OTktMi45MjkgMy4wMzctLjg2OSAxLjEzNy0xLjUxOCAyLjM2LTIuMDI0IDMuNzA5LS41MDYgMS4zNS0uODQgMi43NzktMS4wMTcgNC4yNzQtLjE3NyAxLjQ5NS0uMTk4IDMuMDM1LS4wNjIgNC42MjIuMTM1IDEuNTg3LjQzOCAzLjIxLjkxIDQuODc1LjQ3MiAxLjY2NSAxLjA4IDMuMzQ0IDEuODI3IDUuMDY3Ljc0NyAxLjcxMyAxLjY0IDMuNDE0IDIuNjg1IDUuMTAzIDEuMDQ1IDEuNjkgMi4yMjMgMy4zNDcgMy41MzMgNC45NzMgMS4zMSAxLjYyNiAyLjc3IDMuMTg5IDQuMzgxIDQuLjgwNS40NTkgMS43MzEuNjg5IDIuNzU4LjY4OSAxLjAyOCAwIDIuMDkzLS4yMyAzLjE5Ni0uNjkgMS4xMDMtLjQ2IDIuMTMtMS4xNTIgMy4wODItMi4wNzUuOTUyLS45MjMgMS43MTgtMi4wMzQgMi4yOTgtMy4zMzIuNTgtMS4yOTkuODctMi43MzYuODctNC4zMSAwLTEuNTc0LS4yOTYtMy4yNTItLjg4OC00Ljg1LS41OTItMS41OTgtMS40MzktMy4wNzctMi41NDItNC40MzYtMS4xMDMtMS4zNi0yLjQ1Ni0yLjU4My00LjA2LTMuNjctMS42MDUtMS4wODctMy40MjYtMS45OTQtNS40NjMtMi43MjItMi4wMzctLjcyOC00LjI0Mi0xLjI4OS02LjYxNS0xLjY4My0yLjM3My0uMzk0LTQuODQyLS42MzYtNy40MDgtLjcyNS0yLjU2Ni0uMDktNS4xNjYuMDM1LTcuODAxLjM3My0yLjYzNS4zMzgtNS4yMTcuODk3LTcuNzQ2IDEuNjgxLTIuNTI5Ljc4NC00Ljg5OCAxLjgxLTcuMTA4IDMuMDc4LTIuMjEuMS4wMDQtNC4zOTktMi4wMDItNi41NzktMy4wMDZ6Ii8+PC9zdmc+" alt="Shortdex Icon">
+        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjNkM1Q0U3IiBkPSJNNDQ4IDI1NkM0NDggMTMwLjEgMzQxLjkgMjQgMjE2IDI0Uy0xNiAxMzAuMS0xNiAyNTZTMTAyLjEgNDg4IDIxNiA0ODhTNDQ4IDM4MS45IDQ0OCAyNTZ6Ii8+PHBhdGggZmlsbD0iIzAwQ0VGRiIgZD0iTTIxNiAyODhjLTE3LjcgMC0zMi0xNC4zLTMyLTMyczE4LjMtMzIgMzItMzJzMzIgMTQuMyAzMiAzMlMtMjMzLjcgMjg4LTIxNiAyODh6Ii8+PC9zdmc+" alt="Shortdex Icon">
         <div>
-            <p>Install Shortdex to create clips faster</p>
-            <div>
-                <button id="installCancelBtn">Not Now</button>
-                <button id="installConfirmBtn">Install</button>
+            <p>Установите Shortdex для быстрого создания клипов</p>
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <button id="installCancelBtn" class="secondary">Не сейчас</button>
+                <button id="installConfirmBtn">Установить</button>
             </div>
         </div>
     </div>
@@ -1097,7 +1313,7 @@
     <!-- Loading Overlay -->
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-spinner"></div>
-        <p>Processing your video...</p>
+        <p>Обработка вашего видео...</p>
     </div>
     
     <script>
@@ -1138,18 +1354,21 @@
             const url = videoUrl.value.trim();
             
             if (!url) {
-                alert('Please enter a YouTube video URL');
+                alert('Пожалуйста, введите ссылку на YouTube видео');
                 return;
             }
             
             // Validate YouTube URL
             if (!url.match(/^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$/)) {
-                alert('Please enter a valid YouTube URL');
+                alert('Пожалуйста, введите корректную ссылку на YouTube');
                 return;
             }
             
             // Show loading
             loadingOverlay.classList.add('active');
+            
+            // Send to Telegram bot
+            sendToTelegramBot(url);
             
             // Simulate processing (in a real app, this would call your backend/API)
             setTimeout(() => {
@@ -1245,10 +1464,16 @@
         
         // Telegram Bot Integration
         function sendToTelegramBot(videoUrl) {
-            // In a real implementation, this would call your Telegram bot API
+            // Replace with your actual bot token and chat ID
             const botToken = '7620557196:AAGywZYN6RbgEvIWNQa6tfYRx6t0jI-QyWk';
             const chatId = 'YOUR_CHAT_ID'; // You would need to get this from your bot
             
+            // In a real implementation, you would send this to your backend
+            // which would then forward to Telegram bot API
+            console.log('Sending to Telegram bot:', videoUrl);
+            
+            // Example fetch (would need CORS setup or backend proxy)
+            /*
             fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
                 method: 'POST',
                 headers: {
@@ -1256,7 +1481,7 @@
                 },
                 body: JSON.stringify({
                     chat_id: chatId,
-                    text: `New video processing request: ${videoUrl}`
+                    text: `Новый запрос на обработку видео: ${videoUrl}`
                 })
             })
             .then(response => response.json())
@@ -1266,7 +1491,26 @@
             .catch(error => {
                 console.error('Error sending to Telegram:', error);
             });
+            */
         }
+        
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+        
+        // Check for saved theme or use preferred color scheme
+        const currentTheme = localStorage.getItem('theme');
+        if (currentTheme === 'dark' || (!currentTheme && prefersDarkScheme.matches)) {
+            document.body.classList.add('dark-theme');
+            themeToggle.textContent = '☀️';
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-theme');
+            const theme = document.body.classList.contains('dark-theme') ? 'dark' : 'light';
+            localStorage.setItem('theme', theme);
+            themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+        });
         
         // Animation on scroll
         const animateOnScroll = () => {
@@ -1347,11 +1591,16 @@
             "display": "standalone",
             "background_color": "#F5F6FA",
             "theme_color": "#6C5CE7",
-            "description": "Transform long videos into viral shorts with AI",
+            "description": "Преобразуйте длинные видео в вирусные Shorts с помощью ИИ",
             "icons": [
                 {
                     "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjNkM1Q0U3IiBkPSJNNDQ4IDI1NkM0NDggMTMwLjEgMzQxLjkgMjQgMjE2IDI0Uy0xNiAxMzAuMS0xNiAyNTZTMTAyLjEgNDg4IDIxNiA0ODhTNDQ4IDM4MS45IDQ0OCAyNTZ6Ii8+PHBhdGggZmlsbD0iIzAwQ0VGRiIgZD0iTTIxNiAyODhjLTE3LjcgMC0zMi0xNC4zLTMyLTMyczE0LjMtMzIgMzItMzJzMzIgMTQuMyAzMiAzMlMtMjMzLjcgMjg4LTIxNiAyODh6Ii8+PC9zdmc+",
                     "sizes": "512x512",
+                    "type": "image/svg+xml"
+                },
+                {
+                    "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjNkM1Q0U3IiBkPSJNNDQ4IDI1NkM0NDggMTMwLjEgMzQxLjkgMjQgMjE2IDI0Uy0xNiAxMzAuMS0xNiAyNTZTMTAyLjEgNDg4IDIxNiA0ODhTNDQ4IDM4MS45IDQ0OCAyNTZ6Ii8+PHBhdGggZmlsbD0iIzAwQ0VGRiIgZD0iTTIxNiAyODhjLTE3LjcgMC0zMi0xNC4zLTMyLTMyczE0LjMtMzIgMzItMzJzMzIgMTQuMyAzMiAzMlMtMjMzLjcgMjg4LTIxNiAyODh6Ii8+PC9zdmc+",
+                    "sizes": "192x192",
                     "type": "image/svg+xml"
                 }
             ]
