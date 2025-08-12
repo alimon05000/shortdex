@@ -3,52 +3,471 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Downloader</title>
+    <title>NEON Video Downloader</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon.png">
     <style>
+        :root {
+            --neon-blue: #08f;
+            --neon-pink: #f0f;
+            --neon-purple: #90f;
+            --dark-bg: #111;
+            --card-bg: rgba(20, 20, 30, 0.8);
+            --text-light: #eee;
+        }
+        
+        @font-face {
+            font-family: 'Neon';
+            src: url('https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap');
+        }
+        
         body {
-            font-family: Arial, sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-light);
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 136, 255, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(255, 0, 255, 0.1) 0%, transparent 20%);
+            overflow-x: hidden;
+        }
+        
+        .container {
             max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 
+                0 0 10px var(--neon-blue),
+                0 0 20px var(--neon-purple);
+            border: 1px solid rgba(144, 0, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
         }
-        iframe {
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent 0%,
+                rgba(0, 136, 255, 0.1) 50%,
+                transparent 100%
+            );
+            animation: shine 6s infinite linear;
+            z-index: -1;
+        }
+        
+        @keyframes shine {
+            0% { transform: rotate(0deg) translate(-30%, -30%); }
+            100% { transform: rotate(360deg) translate(-30%, -30%); }
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-pink));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 10px rgba(0, 136, 255, 0.3);
+            position: relative;
+        }
+        
+        .input-group {
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        
+        .url-input {
             width: 100%;
-            height: 500px;
-            border: none;
+            padding: 1rem;
+            background: rgba(10, 10, 20, 0.7);
+            border: 2px solid rgba(144, 0, 255, 0.5);
             border-radius: 10px;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s;
         }
-        input {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
+        
+        .url-input:focus {
+            outline: none;
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 10px var(--neon-blue);
         }
-        button {
-            background: #4285f4;
+        
+        .url-input::placeholder {
+            color: rgba(200, 200, 255, 0.5);
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
             cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            margin-bottom: 1rem;
+            box-shadow: 0 0 15px rgba(0, 136, 255, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                transparent 0%,
+                rgba(255, 255, 255, 0.1) 50%,
+                transparent 100%
+            );
+            transform: rotate(30deg);
+            animation: btnShine 3s infinite linear;
+        }
+        
+        @keyframes btnShine {
+            0% { transform: translateX(-100%) rotate(30deg); }
+            100% { transform: translateX(100%) rotate(30deg); }
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 25px rgba(0, 136, 255, 0.8);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        .btn:disabled {
+            background: #444;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+        
+        .btn:disabled::after {
+            display: none;
+        }
+        
+        .result-container {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            margin-bottom: 2rem;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            background: #000;
+        }
+        
+        .video-wrapper video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .quality-selector {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(10, 10, 20, 0.7);
+            border: 2px solid rgba(144, 0, 255, 0.5);
+            border-radius: 10px;
+            color: white;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2308f'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1rem;
+        }
+        
+        .quality-selector:focus {
+            outline: none;
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 10px var(--neon-blue);
+        }
+        
+        .error-message {
+            color: #ff4d4d;
+            text-align: center;
+            margin: 1rem 0;
+            display: none;
+            animation: shake 0.5s;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+        
+        .platform-icons {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .platform-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+            box-shadow: 0 0 10px rgba(0, 136, 255, 0.3);
+        }
+        
+        .platform-icon:hover {
+            transform: scale(1.1);
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 15px var(--neon-blue);
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 136, 255, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(0, 136, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 136, 255, 0); }
+        }
+        
+        /* Мобильная адаптация */
+        @media (max-width: 768px) {
+            .container {
+                margin: 1rem;
+                padding: 1.5rem;
+                border-radius: 15px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .btn {
+                padding: 0.8rem 1.5rem;
+            }
+        }
+        
+        /* Анимация фона */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--neon-blue);
+            border-radius: 50%;
+            opacity: 0.5;
+            animation: float linear infinite;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0) translateX(0); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(-100vh) translateX(100px); opacity: 0; }
         }
     </style>
 </head>
 <body>
-    <h1>Universal Video Downloader</h1>
-    <input type="url" id="videoUrl" placeholder="Вставьте ссылку на видео">
-    <button onclick="downloadVideo()">Скачать</button>
+    <div class="particles" id="particles"></div>
     
-    <iframe id="downloaderFrame" 
-            src="https://loader.to/api/card/?url="
-            allowfullscreen>
-    </iframe>
+    <div class="container">
+        <h1>NEON VIDEO DOWNLOADER</h1>
+        
+        <div class="input-group">
+            <input type="url" class="url-input" id="videoUrl" placeholder="Вставьте ссылку на YouTube, Instagram, TikTok и др." autocomplete="off">
+            <button class="btn pulse" id="downloadBtn">СКАЧАТЬ</button>
+        </div>
+        
+        <div class="error-message" id="errorMessage"></div>
+        
+        <div class="result-container" id="resultContainer">
+            <div class="video-wrapper">
+                <video controls id="videoPlayer"></video>
+            </div>
+            <select class="quality-selector" id="qualitySelector"></select>
+            <button class="btn" id="saveBtn">СОХРАНИТЬ ВИДЕО</button>
+        </div>
+        
+        <div class="platform-icons">
+            <img src="https://www.youtube.com/favicon.ico" alt="YouTube" class="platform-icon">
+            <img src="https://www.instagram.com/favicon.ico" alt="Instagram" class="platform-icon">
+            <img src="https://www.tiktok.com/favicon.ico" alt="TikTok" class="platform-icon">
+            <img src="https://www.facebook.com/favicon.ico" alt="Facebook" class="platform-icon">
+            <img src="https://www.twitter.com/favicon.ico" alt="Twitter" class="platform-icon">
+        </div>
+    </div>
 
     <script>
-        function downloadVideo() {
-            const url = document.getElementById('videoUrl').value;
-            if (!url) return alert('Введите URL видео');
+        // Создаем частицы для фона
+        function createParticles() {
+            const particles = document.getElementById('particles');
+            const particleCount = 50;
             
-            const frame = document.getElementById('downloaderFrame');
-            frame.src = `https://loader.to/api/card/?url=${encodeURIComponent(url)}`;
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Случайная позиция
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                
+                // Случайный размер
+                const size = Math.random() * 3 + 1;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                // Случайный цвет
+                const colors = ['#08f', '#f0f', '#90f', '#0ff'];
+                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                
+                // Случайная длительность анимации
+                const duration = Math.random() * 20 + 10;
+                particle.style.animationDuration = `${duration}s`;
+                
+                // Случайная задержка
+                particle.style.animationDelay = `${Math.random() * 10}s`;
+                
+                particles.appendChild(particle);
+            }
+        }
+        
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', () => {
+            createParticles();
+            
+            // Обработчик кнопки скачивания
+            document.getElementById('downloadBtn').addEventListener('click', async () => {
+                const url = document.getElementById('videoUrl').value.trim();
+                if (!url) {
+                    showError('Пожалуйста, введите URL видео');
+                    return;
+                }
+                
+                resetUI();
+                document.getElementById('downloadBtn').disabled = true;
+                document.getElementById('downloadBtn').classList.remove('pulse');
+                
+                try {
+                    // Здесь будет логика получения видео
+                    // Для демонстрации используем заглушку
+                    await simulateDownload(url);
+                    
+                    // Показываем результат
+                    showResult();
+                } catch (error) {
+                    showError(error.message);
+                } finally {
+                    document.getElementById('downloadBtn').disabled = false;
+                    document.getElementById('downloadBtn').classList.add('pulse');
+                }
+            });
+            
+            // Обработчик кнопки сохранения
+            document.getElementById('saveBtn').addEventListener('click', () => {
+                const videoUrl = document.getElementById('videoPlayer').src;
+                if (videoUrl) {
+                    const a = document.createElement('a');
+                    a.href = videoUrl;
+                    a.download = 'video.mp4';
+                    a.click();
+                }
+            });
+        });
+        
+        // Функция для демонстрации (замените на реальную логику)
+        async function simulateDownload(url) {
+            return new Promise((resolve, reject) => {
+                // Имитация загрузки
+                setTimeout(() => {
+                    if (url.includes('example.com')) {
+                        reject(new Error('Неверный URL видео'));
+                    } else {
+                        resolve();
+                    }
+                }, 2000);
+            });
+        }
+        
+        function showResult() {
+            const resultContainer = document.getElementById('resultContainer');
+            const videoPlayer = document.getElementById('videoPlayer');
+            const qualitySelector = document.getElementById('qualitySelector');
+            
+            // Заглушка для демонстрации (замените на реальные данные)
+            videoPlayer.src = 'https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4';
+            
+            // Заглушка для вариантов качества
+            qualitySelector.innerHTML = '';
+            const qualities = [
+                { label: '1080p HD', value: 'high' },
+                { label: '720p HD', value: 'medium' },
+                { label: '480p', value: 'low' }
+            ];
+            
+            qualities.forEach(quality => {
+                const option = document.createElement('option');
+                option.value = quality.value;
+                option.textContent = quality.label;
+                qualitySelector.appendChild(option);
+            });
+            
+            resultContainer.style.display = 'block';
+        }
+        
+        function resetUI() {
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('resultContainer').style.display = 'none';
+        }
+        
+        function showError(message) {
+            const errorElement = document.getElementById('errorMessage');
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
         }
     </script>
 </body>
