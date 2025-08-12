@@ -267,6 +267,27 @@
             100% { box-shadow: 0 0 0 0 rgba(0, 136, 255, 0); }
         }
         
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 1rem 0;
+        }
+        
+        .loading-spinner {
+            border: 4px solid rgba(0, 136, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid var(--neon-blue);
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
         /* Мобильная адаптация */
         @media (max-width: 768px) {
             .container {
@@ -321,6 +342,11 @@
         <div class="input-group">
             <input type="url" class="url-input" id="videoUrl" placeholder="Вставьте ссылку на YouTube, Instagram, TikTok и др." autocomplete="off">
             <button class="btn pulse" id="downloadBtn">СКАЧАТЬ</button>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="loading-spinner"></div>
+            <p>Обработка видео...</p>
         </div>
         
         <div class="error-message" id="errorMessage"></div>
@@ -391,68 +417,237 @@
                 resetUI();
                 document.getElementById('downloadBtn').disabled = true;
                 document.getElementById('downloadBtn').classList.remove('pulse');
+                document.getElementById('loading').style.display = 'block';
                 
                 try {
-                    // Здесь будет логика получения видео
-                    // Для демонстрации используем заглушку
-                    await simulateDownload(url);
+                    // Определяем тип видео по домену
+                    let videoInfo;
+                    
+                    if (url.includes('youtube.com') || url.includes('youtu.be')) {
+                        videoInfo = await fetchYouTubeVideo(url);
+                    } else if (url.includes('instagram.com')) {
+                        videoInfo = await fetchInstagramVideo(url);
+                    } else if (url.includes('tiktok.com')) {
+                        videoInfo = await fetchTikTokVideo(url);
+                    } else if (url.includes('facebook.com') || url.includes('fb.watch')) {
+                        videoInfo = await fetchFacebookVideo(url);
+                    } else if (url.includes('twitter.com') || url.includes('x.com')) {
+                        videoInfo = await fetchTwitterVideo(url);
+                    } else {
+                        throw new Error('Неподдерживаемый сервис. Пожалуйста, используйте YouTube, Instagram, TikTok, Facebook или Twitter.');
+                    }
                     
                     // Показываем результат
-                    showResult();
+                    showResult(videoInfo);
                 } catch (error) {
                     showError(error.message);
+                    console.error('Ошибка при загрузке видео:', error);
                 } finally {
                     document.getElementById('downloadBtn').disabled = false;
                     document.getElementById('downloadBtn').classList.add('pulse');
+                    document.getElementById('loading').style.display = 'none';
                 }
             });
             
             // Обработчик кнопки сохранения
             document.getElementById('saveBtn').addEventListener('click', () => {
+                const selectedQuality = document.getElementById('qualitySelector').value;
                 const videoUrl = document.getElementById('videoPlayer').src;
+                
                 if (videoUrl) {
                     const a = document.createElement('a');
                     a.href = videoUrl;
-                    a.download = 'video.mp4';
+                    a.download = `video_${selectedQuality}.mp4`;
                     a.click();
+                }
+            });
+            
+            // Обработчик изменения качества
+            document.getElementById('qualitySelector').addEventListener('change', function() {
+                const videoPlayer = document.getElementById('videoPlayer');
+                const selectedUrl = this.options[this.selectedIndex].dataset.url;
+                if (selectedUrl) {
+                    videoPlayer.src = selectedUrl;
                 }
             });
         });
         
-        // Функция для демонстрации (замените на реальную логику)
-        async function simulateDownload(url) {
-            return new Promise((resolve, reject) => {
-                // Имитация загрузки
-                setTimeout(() => {
-                    if (url.includes('example.com')) {
-                        reject(new Error('Неверный URL видео'));
-                    } else {
-                        resolve();
-                    }
-                }, 2000);
+        // Функции для получения видео с разных платформ
+        
+        async function fetchYouTubeVideo(url) {
+            // Используем прокси для YouTube
+            const proxyUrl = `https://yt-downloader-proxy.herokuapp.com/api/info?url=${encodeURIComponent(url)}`;
+            
+            const response = await fetch(proxyUrl);
+            if (!response.ok) {
+                throw new Error('Не удалось получить информацию о видео с YouTube');
+            }
+            
+            const data = await response.json();
+            
+            // Формируем информацию о видео
+            const videoInfo = {
+                title: data.videoDetails.title,
+                thumbnail: data.videoDetails.thumbnail.thumbnails.pop().url,
+                formats: []
+            };
+            
+            // Фильтруем доступные форматы
+            data.formats.forEach(format => {
+                if (format.mimeType && format.mimeType.includes('video/mp4')) {
+                    videoInfo.formats.push({
+                        quality: format.qualityLabel || `${format.height}p`,
+                        url: format.url,
+                        audio: format.hasAudio
+                    });
+                }
             });
+            
+            // Сортируем по качеству
+            videoInfo.formats.sort((a, b) => {
+                return parseInt(b.quality) - parseInt(a.quality);
+            });
+            
+            return videoInfo;
         }
         
-        function showResult() {
+        async function fetchInstagramVideo(url) {
+            // Используем прокси для Instagram
+            const proxyUrl = `https://api.instagramdownloader.pro/api?url=${encodeURIComponent(url)}`;
+            
+            const response = await fetch(proxyUrl);
+            if (!response.ok) {
+                throw new Error('Не удалось получить информацию о видео с Instagram');
+            }
+            
+            const data = await response.json();
+            
+            if (!data.videoUrl) {
+                throw new Error('Видео не найдено или это не публичный аккаунт');
+            }
+            
+            return {
+                title: 'Instagram Video',
+                thumbnail: data.thumbnail || '',
+                formats: [{
+                    quality: 'HD',
+                    url: data.videoUrl,
+                    audio: true
+                }]
+            };
+        }
+        
+        async function fetchTikTokVideo(url) {
+            // Используем прокси для TikTok
+            const proxyUrl = `https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`;
+            
+            const response = await fetch(proxyUrl);
+            if (!response.ok) {
+                throw new Error('Не удалось получить информацию о видео с TikTok');
+            }
+            
+            const data = await response.json();
+            
+            if (!data.data || !data.data.play) {
+                throw new Error('Видео не найдено или это не публичный аккаунт');
+            }
+            
+            return {
+                title: data.data.title || 'TikTok Video',
+                thumbnail: data.data.cover || '',
+                formats: [{
+                    quality: 'HD',
+                    url: data.data.play,
+                    audio: true
+                }]
+            };
+        }
+        
+        async function fetchFacebookVideo(url) {
+            // Используем прокси для Facebook
+            const proxyUrl = `https://fbdownloader.net/api/ajaxSearch?url=${encodeURIComponent(url)}`;
+            
+            const response = await fetch(proxyUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error('Не удалось получить информацию о видео с Facebook');
+            }
+            
+            const data = await response.json();
+            
+            if (!data.links || !data.links.hd) {
+                throw new Error('Видео не найдено или это не публичный аккаунт');
+            }
+            
+            return {
+                title: 'Facebook Video',
+                thumbnail: data.picture || '',
+                formats: [{
+                    quality: 'HD',
+                    url: data.links.hd,
+                    audio: true
+                }, {
+                    quality: 'SD',
+                    url: data.links.sd,
+                    audio: true
+                }]
+            };
+        }
+        
+        async function fetchTwitterVideo(url) {
+            // Используем прокси для Twitter
+            const proxyUrl = `https://twitsave.com/info?url=${encodeURIComponent(url)}`;
+            
+            const response = await fetch(proxyUrl);
+            if (!response.ok) {
+                throw new Error('Не удалось получить информацию о видео с Twitter');
+            }
+            
+            const data = await response.json();
+            
+            if (!data.video || !data.video.length) {
+                throw new Error('Видео не найдено или это не публичный твит');
+            }
+            
+            // Получаем видео с самым высоким качеством
+            const bestQuality = data.video.reduce((prev, current) => {
+                return (prev.quality > current.quality) ? prev : current;
+            });
+            
+            return {
+                title: 'Twitter Video',
+                thumbnail: data.thumbnail || '',
+                formats: [{
+                    quality: bestQuality.quality + 'p',
+                    url: bestQuality.url,
+                    audio: true
+                }]
+            };
+        }
+        
+        function showResult(videoInfo) {
             const resultContainer = document.getElementById('resultContainer');
             const videoPlayer = document.getElementById('videoPlayer');
             const qualitySelector = document.getElementById('qualitySelector');
             
-            // Заглушка для демонстрации (замените на реальные данные)
-            videoPlayer.src = 'https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4';
+            // Устанавливаем видео
+            const bestQuality = videoInfo.formats[0];
+            videoPlayer.src = bestQuality.url;
+            videoPlayer.poster = videoInfo.thumbnail;
             
-            // Заглушка для вариантов качества
+            // Заполняем варианты качества
             qualitySelector.innerHTML = '';
-            const qualities = [
-                { label: '1080p HD', value: 'high' },
-                { label: '720p HD', value: 'medium' },
-                { label: '480p', value: 'low' }
-            ];
-            
-            qualities.forEach(quality => {
+            videoInfo.formats.forEach((format, index) => {
                 const option = document.createElement('option');
-                option.value = quality.value;
-                option.textContent = quality.label;
+                option.value = format.quality;
+                option.textContent = `${format.quality}${format.audio ? '' : ' (без звука)'}`;
+                option.dataset.url = format.url;
+                if (index === 0) option.selected = true;
                 qualitySelector.appendChild(option);
             });
             
