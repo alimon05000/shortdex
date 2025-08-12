@@ -311,6 +311,13 @@
             100% { transform: rotate(360deg); }
         }
         
+        .download-message {
+            color: var(--neon-blue);
+            text-align: center;
+            margin: 0.5rem 0;
+            display: none;
+        }
+        
         /* Мобильная адаптация */
         @media (max-width: 768px) {
             body {
@@ -367,7 +374,7 @@
         <h1>NEON VIDEO DOWNLOADER</h1>
         
         <div class="input-group">
-            <input type="url" class="url-input" id="videoUrl" placeholder="Вставьте ссылку на YouTube, Instagram, TikTok, Facebook или Twitter" autocomplete="off">
+            <input type="url" class="url-input" id="videoUrl" placeholder="Вставьте ссылку на YouTube, Instagram (Reels), TikTok, Facebook или Twitter" autocomplete="off">
             <button class="btn pulse" id="downloadBtn">СКАЧАТЬ</button>
         </div>
         
@@ -377,10 +384,12 @@
         </div>
         
         <div class="error-message" id="errorMessage"></div>
+        <div class="download-message" id="downloadMessage"></div>
         
         <div class="result-container" id="resultContainer">
             <div class="video-wrapper">
                 <video controls id="videoPlayer"></video>
+                <iframe class="video-iframe" id="videoIframe" allowfullscreen style="display: none;"></iframe>
             </div>
             <select class="quality-selector" id="qualitySelector"></select>
             <button class="btn" id="saveBtn">СОХРАНИТЬ ВИДЕО</button>
@@ -469,7 +478,7 @@
                     } else if (url.includes('twitter.com') || url.includes('x.com')) {
                         videoInfo = await fetchTwitterVideo(url);
                     } else {
-                        throw new Error('Неподдерживаемый сервис. Пожалуйста, используйте YouTube, Instagram, TikTok, Facebook или Twitter.');
+                        throw new Error('Неподдерживаемый сервис. Пожалуйста, используйте YouTube, Instagram (Reels), TikTok, Facebook или Twitter.');
                     }
                     
                     // Показываем результат
@@ -489,18 +498,40 @@
                 const qualitySelector = document.getElementById('qualitySelector');
                 const selectedOption = qualitySelector.options[qualitySelector.selectedIndex];
                 const videoUrl = selectedOption.dataset.url;
+                const isEmbed = selectedOption.dataset.embed === 'true';
                 
-                if (videoUrl) {
-                    try {
-                        document.getElementById('saveBtn').disabled = true;
-                        document.getElementById('saveBtn').textContent = 'Скачивание...';
+                if (!videoUrl) return;
+                
+                try {
+                    document.getElementById('saveBtn').disabled = true;
+                    document.getElementById('saveBtn').textContent = 'Скачивание...';
+                    document.getElementById('downloadMessage').textContent = 'Идет скачивание видео...';
+                    document.getElementById('downloadMessage').style.display = 'block';
+                    
+                    let downloadUrl;
+                    
+                    if (isEmbed) {
+                        // Для встроенных видео используем сервис savefrom.net
+                        const serviceUrl = `https://en.savefrom.net/#url=${encodeURIComponent(videoUrl)}`;
+                        document.getElementById('downloadMessage').innerHTML = `
+                            Для скачивания встроенного видео перейдите по <a href="${serviceUrl}" target="_blank" style="color: var(--neon-blue);">этой ссылке</a>.
+                            <br>Откроется сервис savefrom.net, где вы сможете скачать видео.
+                        `;
+                        return;
+                    } else {
+                        // Для прямых ссылок используем fetch
+                        const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(videoUrl)}`);
+                        if (!response.ok) throw new Error('Не удалось получить видео');
                         
-                        // Для скачивания используем прокси-сервер
-                        const response = await fetch(`https://cors-anywhere.herokuapp.com/${videoUrl}`);
-                        if (!response.ok) throw new Error('Не удалось скачать видео');
+                        const data = await response.json();
+                        const content = data.contents || data;
                         
-                        const blob = await response.blob();
-                        const downloadUrl = window.URL.createObjectURL(blob);
+                        if (typeof content === 'string' && content.includes('<html')) {
+                            throw new Error('Не удалось получить прямой доступ к видео');
+                        }
+                        
+                        const blob = new Blob([content], { type: 'video/mp4' });
+                        downloadUrl = window.URL.createObjectURL(blob);
                         
                         const a = document.createElement('a');
                         a.href = downloadUrl;
@@ -513,48 +544,53 @@
                         setTimeout(() => {
                             window.URL.revokeObjectURL(downloadUrl);
                         }, 100);
-                    } catch (error) {
-                        showError('Не удалось скачать видео. Попробуйте позже или используйте другой сервис.');
-                        console.error('Ошибка при скачивании:', error);
-                    } finally {
-                        document.getElementById('saveBtn').disabled = false;
-                        document.getElementById('saveBtn').textContent = 'СОХРАНИТЬ ВИДЕО';
                     }
+                } catch (error) {
+                    showError('Не удалось скачать видео напрямую. Попробуйте использовать сервис savefrom.net для встроенных видео.');
+                    console.error('Ошибка при скачивании:', error);
+                } finally {
+                    document.getElementById('saveBtn').disabled = false;
+                    document.getElementById('saveBtn').textContent = 'СОХРАНИТЬ ВИДЕО';
+                    setTimeout(() => {
+                        document.getElementById('downloadMessage').style.display = 'none';
+                    }, 5000);
                 }
             });
             
             // Обработчик изменения качества
             document.getElementById('qualitySelector').addEventListener('change', function() {
                 const videoPlayer = document.getElementById('videoPlayer');
-                const iframe = document.querySelector('.video-iframe');
+                const videoIframe = document.getElementById('videoIframe');
                 const selectedOption = this.options[this.selectedIndex];
+                const videoUrl = selectedOption.dataset.url;
+                const isEmbed = selectedOption.dataset.embed === 'true';
                 
-                if (selectedOption.dataset.url) {
-                    if (selectedOption.dataset.embed === 'true') {
-                        // Для встроенного видео
-                        videoPlayer.style.display = 'none';
-                        if (iframe) iframe.style.display = 'block';
-                        
-                        if (iframe) {
-                            if (selectedOption.dataset.url.includes('youtube.com') || selectedOption.dataset.url.includes('youtu.be')) {
-                                const videoId = getYouTubeId(selectedOption.dataset.url);
-                                iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
-                            } else if (selectedOption.dataset.url.includes('instagram.com')) {
-                                iframe.src = selectedOption.dataset.url + 'embed';
-                            } else if (selectedOption.dataset.url.includes('tiktok.com')) {
-                                iframe.src = `https://www.tiktok.com/embed/v2/${getTikTokId(selectedOption.dataset.url)}`;
-                            } else if (selectedOption.dataset.url.includes('facebook.com')) {
-                                iframe.src = `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(selectedOption.dataset.url)}`;
-                            } else if (selectedOption.dataset.url.includes('twitter.com') || selectedOption.dataset.url.includes('x.com')) {
-                                iframe.src = `https://twitframe.com/show?url=${encodeURIComponent(selectedOption.dataset.url)}`;
-                            }
-                        }
-                    } else {
-                        // Для прямого видео
-                        if (iframe) iframe.style.display = 'none';
-                        videoPlayer.style.display = 'block';
-                        videoPlayer.src = selectedOption.dataset.url;
+                if (!videoUrl) return;
+                
+                if (isEmbed) {
+                    // Для встроенного видео
+                    videoPlayer.style.display = 'none';
+                    videoIframe.style.display = 'block';
+                    
+                    if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
+                        const videoId = getYouTubeId(videoUrl);
+                        videoIframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+                    } else if (videoUrl.includes('instagram.com')) {
+                        videoIframe.src = videoUrl.includes('/reel/') || videoUrl.includes('/reels/') 
+                            ? `https://www.instagram.com/reel/${getInstagramReelId(videoUrl)}/embed`
+                            : videoUrl + 'embed';
+                    } else if (videoUrl.includes('tiktok.com')) {
+                        videoIframe.src = `https://www.tiktok.com/embed/v2/${getTikTokId(videoUrl)}`;
+                    } else if (videoUrl.includes('facebook.com')) {
+                        videoIframe.src = `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(videoUrl)}`;
+                    } else if (videoUrl.includes('twitter.com') || videoUrl.includes('x.com')) {
+                        videoIframe.src = `https://twitframe.com/show?url=${encodeURIComponent(videoUrl)}`;
                     }
+                } else {
+                    // Для прямого видео
+                    videoIframe.style.display = 'none';
+                    videoPlayer.style.display = 'block';
+                    videoPlayer.src = videoUrl;
                 }
             });
         });
@@ -565,6 +601,7 @@
             const videoId = getYouTubeId(url);
             if (!videoId) throw new Error('Неверная ссылка на YouTube');
             
+            // Используем iframe для YouTube, так как прямые ссылки требуют серверной обработки
             return {
                 title: 'YouTube Video',
                 thumbnail: `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
@@ -573,11 +610,6 @@
                         quality: 'HD (встроенное)',
                         url: url,
                         embed: true
-                    },
-                    {
-                        quality: '360p',
-                        url: `https://www.youtube.com/watch?v=${videoId}`,
-                        embed: false
                     }
                 ]
             };
@@ -588,12 +620,15 @@
                 throw new Error('Неверная ссылка на Instagram');
             }
             
+            const isReel = url.includes('/reel/') || url.includes('/reels/');
+            const videoId = isReel ? getInstagramReelId(url) : null;
+            
             return {
-                title: 'Instagram Video',
+                title: isReel ? 'Instagram Reels' : 'Instagram Video',
                 thumbnail: '',
                 formats: [
                     {
-                        quality: 'Встроенное',
+                        quality: isReel ? 'Reels (встроенное)' : 'Video (встроенное)',
                         url: url,
                         embed: true
                     }
@@ -610,7 +645,7 @@
                 thumbnail: '',
                 formats: [
                     {
-                        quality: 'Встроенное',
+                        quality: 'TikTok (встроенное)',
                         url: url,
                         embed: true
                     }
@@ -628,7 +663,7 @@
                 thumbnail: '',
                 formats: [
                     {
-                        quality: 'Встроенное',
+                        quality: 'Facebook (встроенное)',
                         url: url,
                         embed: true
                     }
@@ -646,7 +681,7 @@
                 thumbnail: '',
                 formats: [
                     {
-                        quality: 'Встроенное',
+                        quality: 'Twitter (встроенное)',
                         url: url,
                         embed: true
                     }
@@ -657,6 +692,7 @@
         function showResult(videoInfo) {
             const resultContainer = document.getElementById('resultContainer');
             const videoPlayer = document.getElementById('videoPlayer');
+            const videoIframe = document.getElementById('videoIframe');
             const qualitySelector = document.getElementById('qualitySelector');
             
             // Очищаем предыдущие варианты
@@ -665,7 +701,7 @@
             // Добавляем варианты качества
             videoInfo.formats.forEach((format, index) => {
                 const option = document.createElement('option');
-                option.value = format.quality.replace(/\s\(.*\)/, '');
+                option.value = format.quality.replace(/\s\(.*\)/, '').toLowerCase();
                 option.textContent = format.quality;
                 option.dataset.url = format.url;
                 option.dataset.embed = format.embed ? 'true' : 'false';
@@ -678,41 +714,25 @@
             if (firstFormat.embed) {
                 // Для встроенного видео
                 videoPlayer.style.display = 'none';
+                videoIframe.style.display = 'block';
                 
-                // Создаем iframe если его нет
-                let iframe = document.querySelector('.video-iframe');
-                if (!iframe) {
-                    iframe = document.createElement('iframe');
-                    iframe.classList.add('video-iframe');
-                    iframe.setAttribute('allowfullscreen', '');
-                    iframe.style.position = 'absolute';
-                    iframe.style.top = '0';
-                    iframe.style.left = '0';
-                    iframe.style.width = '100%';
-                    iframe.style.height = '100%';
-                    iframe.style.border = 'none';
-                    videoPlayer.parentNode.appendChild(iframe);
-                } else {
-                    iframe.style.display = 'block';
-                }
-                
-                // Устанавливаем src для iframe
                 if (firstFormat.url.includes('youtube.com') || firstFormat.url.includes('youtu.be')) {
                     const videoId = getYouTubeId(firstFormat.url);
-                    iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+                    videoIframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
                 } else if (firstFormat.url.includes('instagram.com')) {
-                    iframe.src = firstFormat.url + 'embed';
+                    videoIframe.src = firstFormat.url.includes('/reel/') || firstFormat.url.includes('/reels/') 
+                        ? `https://www.instagram.com/reel/${getInstagramReelId(firstFormat.url)}/embed`
+                        : firstFormat.url + 'embed';
                 } else if (firstFormat.url.includes('tiktok.com')) {
-                    iframe.src = `https://www.tiktok.com/embed/v2/${getTikTokId(firstFormat.url)}`;
+                    videoIframe.src = `https://www.tiktok.com/embed/v2/${getTikTokId(firstFormat.url)}`;
                 } else if (firstFormat.url.includes('facebook.com')) {
-                    iframe.src = `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(firstFormat.url)}`;
+                    videoIframe.src = `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(firstFormat.url)}`;
                 } else if (firstFormat.url.includes('twitter.com') || firstFormat.url.includes('x.com')) {
-                    iframe.src = `https://twitframe.com/show?url=${encodeURIComponent(firstFormat.url)}`;
+                    videoIframe.src = `https://twitframe.com/show?url=${encodeURIComponent(firstFormat.url)}`;
                 }
             } else {
                 // Для прямого видео
-                const iframe = document.querySelector('.video-iframe');
-                if (iframe) iframe.style.display = 'none';
+                videoIframe.style.display = 'none';
                 videoPlayer.style.display = 'block';
                 videoPlayer.src = firstFormat.url;
                 if (videoInfo.thumbnail) {
@@ -729,6 +749,12 @@
             return (match && match[2].length === 11) ? match[2] : null;
         }
         
+        function getInstagramReelId(url) {
+            const regExp = /\/reel\/([^\/?]+)/;
+            const match = url.match(regExp);
+            return match ? match[1] : null;
+        }
+        
         function getTikTokId(url) {
             const regExp = /\/video\/(\d+)/;
             const match = url.match(regExp);
@@ -737,6 +763,7 @@
         
         function resetUI() {
             document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('downloadMessage').style.display = 'none';
             document.getElementById('resultContainer').style.display = 'none';
         }
         
