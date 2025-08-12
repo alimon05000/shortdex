@@ -3,1614 +3,238 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shortdex - Создавайте вирусные Shorts из любого видео</title>
-    <meta name="description" content="Преобразуйте длинные видео в вирусные Shorts с помощью ИИ. Просто вставьте ссылку и получите 10+ готовых клипов для YouTube Shorts!">
-    <meta name="theme-color" content="#000000">
-    <link rel="manifest" href="/manifest.webmanifest">
+    <title>Video Split Downloader</title>
     <style>
-        :root {
-            --primary: #6C5CE7;
-            --secondary: #00CEFF;
-            --dark: #2D3436;
-            --light: #F5F6FA;
-            --success: #00B894;
-            --warning: #FDCB6E;
-            --danger: #D63031;
-            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
-            --dark-bg: #121212;
-            --dark-card: #1E1E1E;
-            --dark-text: #E0E0E0;
-            --dark-border: #333333;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
         body {
-            background-color: var(--light);
-            color: var(--dark);
-            overflow-x: hidden;
-            transition: all 0.3s ease;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f0f2f5;
+            color: #333;
         }
-        
-        body.dark-theme {
-            background-color: var(--dark-bg);
-            color: var(--dark-text);
-        }
-        
-        /* Animated Background */
-        .bg-animation {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            background: var(--gradient);
-            opacity: 0.1;
-            overflow: hidden;
-        }
-        
-        body.dark-theme .bg-animation {
-            opacity: 0.05;
-        }
-        
-        .bg-animation span {
-            position: absolute;
-            display: block;
-            width: 20px;
-            height: 20px;
-            background: rgba(255, 255, 255, 0.5);
-            border-radius: 50%;
-            animation: animate 15s linear infinite;
-            bottom: -150px;
-        }
-        
-        body.dark-theme .bg-animation span {
-            background: rgba(0, 0, 0, 0.2);
-        }
-        
-        .bg-animation span:nth-child(1) {
-            left: 25%;
-            width: 80px;
-            height: 80px;
-            animation-delay: 0s;
-        }
-        
-        .bg-animation span:nth-child(2) {
-            left: 10%;
-            width: 20px;
-            height: 20px;
-            animation-delay: 2s;
-            animation-duration: 12s;
-        }
-        
-        .bg-animation span:nth-child(3) {
-            left: 70%;
-            width: 20px;
-            height: 20px;
-            animation-delay: 4s;
-        }
-        
-        .bg-animation span:nth-child(4) {
-            left: 40%;
-            width: 60px;
-            height: 60px;
-            animation-delay: 0s;
-            animation-duration: 18s;
-        }
-        
-        .bg-animation span:nth-child(5) {
-            left: 65%;
-            width: 20px;
-            height: 20px;
-            animation-delay: 0s;
-        }
-        
-        .bg-animation span:nth-child(6) {
-            left: 75%;
-            width: 110px;
-            height: 110px;
-            animation-delay: 3s;
-        }
-        
-        .bg-animation span:nth-child(7) {
-            left: 35%;
-            width: 150px;
-            height: 150px;
-            animation-delay: 7s;
-        }
-        
-        .bg-animation span:nth-child(8) {
-            left: 50%;
-            width: 25px;
-            height: 25px;
-            animation-delay: 15s;
-            animation-duration: 45s;
-        }
-        
-        .bg-animation span:nth-child(9) {
-            left: 20%;
-            width: 15px;
-            height: 15px;
-            animation-delay: 2s;
-            animation-duration: 35s;
-        }
-        
-        .bg-animation span:nth-child(10) {
-            left: 85%;
-            width: 150px;
-            height: 150px;
-            animation-delay: 0s;
-            animation-duration: 11s;
-        }
-        
-        @keyframes animate {
-            0% { transform: translateY(0) rotate(0deg); opacity: 1; border-radius: 0; }
-            100% { transform: translateY(-1000px) rotate(720deg); opacity: 0; border-radius: 50%; }
-        }
-        
-        /* Main Container */
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            position: relative;
-            z-index: 1;
-        }
-        
-        /* Header */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 0;
-            margin-bottom: 40px;
-        }
-        
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .logo img {
-            width: 40px;
-            height: 40px;
-        }
-        
-        .logo h1 {
-            font-size: 28px;
-            font-weight: 800;
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-        
-        nav ul {
-            display: flex;
-            list-style: none;
-            gap: 30px;
-        }
-        
-        nav a {
-            text-decoration: none;
-            color: var(--dark);
-            font-weight: 600;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-        
-        body.dark-theme nav a {
-            color: var(--dark-text);
-        }
-        
-        nav a:hover {
-            color: var(--primary);
-        }
-        
-        nav a::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--gradient);
-            transition: width 0.3s ease;
-        }
-        
-        nav a:hover::after {
-            width: 100%;
-        }
-        
-        .cta-button {
-            background: var(--gradient);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 30px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
-        }
-        
-        .cta-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(108, 92, 231, 0.4);
-        }
-        
-        .theme-toggle {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: var(--dark);
-            margin-left: 15px;
-        }
-        
-        body.dark-theme .theme-toggle {
-            color: var(--dark-text);
-        }
-        
-        /* Hero Section */
-        .hero {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            margin-bottom: 80px;
-        }
-        
-        .hero h2 {
-            font-size: 48px;
-            font-weight: 800;
-            margin-bottom: 20px;
-            line-height: 1.2;
-            max-width: 800px;
-        }
-        
-        .hero h2 span {
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-        
-        .hero p {
-            font-size: 20px;
-            color: #666;
-            margin-bottom: 40px;
-            max-width: 600px;
-        }
-        
-        body.dark-theme .hero p {
-            color: #aaa;
-        }
-        
-        /* URL Input Section */
-        .url-input {
-            width: 100%;
-            max-width: 800px;
-            margin: 0 auto 60px;
-            position: relative;
-        }
-        
-        .url-input-container {
-            display: flex;
             background: white;
-            border-radius: 50px;
-            padding: 5px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        
-        body.dark-theme .url-input-container {
-            background: var(--dark-card);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        h1 {
+            color: #4285f4;
+            text-align: center;
+            margin-bottom: 30px;
         }
-        
-        .url-input-container:focus-within {
-            box-shadow: 0 15px 40px rgba(108, 92, 231, 0.2);
+        .input-group {
+            margin-bottom: 20px;
         }
-        
-        body.dark-theme .url-input-container:focus-within {
-            box-shadow: 0 15px 40px rgba(108, 92, 231, 0.4);
-        }
-        
-        .url-input-container input {
-            flex: 1;
-            padding: 20px;
-            border: none;
-            border-radius: 50px 0 0 50px;
+        input[type="url"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
             font-size: 16px;
+            transition: border 0.3s;
+        }
+        input[type="url"]:focus {
+            border-color: #4285f4;
             outline: none;
-            background: white;
-            color: var(--dark);
         }
-        
-        body.dark-theme .url-input-container input {
-            background: var(--dark-card);
-            color: var(--dark-text);
-        }
-        
-        .url-input-container button {
-            background: var(--gradient);
+        button {
+            background: #4285f4;
             color: white;
             border: none;
-            padding: 0 30px;
-            border-radius: 50px;
-            font-weight: 600;
+            padding: 12px 24px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            transition: background 0.3s;
         }
-        
-        .url-input-container button:hover {
-            opacity: 0.9;
+        button:hover {
+            background: #3367d6;
         }
-        
-        .supported-platforms {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
+        button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+        .progress-container {
             margin-top: 20px;
-            flex-wrap: wrap;
-        }
-        
-        .platform {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            background: rgba(255, 255, 255, 0.7);
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 14px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        }
-        
-        body.dark-theme .platform {
-            background: rgba(30, 30, 30, 0.7);
-            color: var(--dark-text);
-        }
-        
-        .platform img {
-            width: 20px;
-            height: 20px;
-        }
-        
-        /* Features Section */
-        .features {
-            margin-bottom: 80px;
-        }
-        
-        .section-title {
-            text-align: center;
-            margin-bottom: 50px;
-        }
-        
-        .section-title h3 {
-            font-size: 36px;
-            font-weight: 700;
-            margin-bottom: 15px;
-        }
-        
-        .section-title p {
-            font-size: 18px;
-            color: #666;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        
-        body.dark-theme .section-title p {
-            color: #aaa;
-        }
-        
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-        }
-        
-        .feature-card {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease;
-        }
-        
-        body.dark-theme .feature-card {
-            background: var(--dark-card);
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-        }
-        
-        .feature-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-        }
-        
-        body.dark-theme .feature-card:hover {
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
-        }
-        
-        .feature-icon {
-            width: 60px;
-            height: 60px;
-            background: var(--gradient);
-            border-radius: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-        
-        .feature-icon img {
-            width: 30px;
-            height: 30px;
-        }
-        
-        .feature-card h4 {
-            font-size: 22px;
-            margin-bottom: 15px;
-            font-weight: 700;
-        }
-        
-        body.dark-theme .feature-card h4 {
-            color: var(--dark-text);
-        }
-        
-        .feature-card p {
-            color: #666;
-            line-height: 1.6;
-        }
-        
-        body.dark-theme .feature-card p {
-            color: #aaa;
-        }
-        
-        /* How It Works Section */
-        .how-it-works {
-            margin-bottom: 80px;
-        }
-        
-        .steps {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 20px;
-            position: relative;
-        }
-        
-        .step {
-            flex: 1;
-            min-width: 250px;
-            text-align: center;
-            position: relative;
-            padding: 30px;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-            z-index: 1;
-        }
-        
-        body.dark-theme .step {
-            background: var(--dark-card);
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-        }
-        
-        .step-number {
-            width: 50px;
-            height: 50px;
-            background: var(--gradient);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            font-weight: 700;
-            margin: 0 auto 20px;
-        }
-        
-        .step h4 {
-            font-size: 20px;
-            margin-bottom: 15px;
-        }
-        
-        body.dark-theme .step h4 {
-            color: var(--dark-text);
-        }
-        
-        .step p {
-            color: #666;
-        }
-        
-        body.dark-theme .step p {
-            color: #aaa;
-        }
-        
-        .steps::before {
-            content: '';
-            position: absolute;
-            top: 25px;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: var(--gradient);
-            z-index: 0;
-        }
-        
-        /* Results Preview */
-        .results-preview {
-            margin-bottom: 80px;
-        }
-        
-        .results-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-        }
-        
-        .result-card {
-            background: white;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-        
-        body.dark-theme .result-card {
-            background: var(--dark-card);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-        
-        .result-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-        }
-        
-        body.dark-theme .result-card:hover {
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-        }
-        
-        .result-thumbnail {
-            height: 200px;
-            background: #eee;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        body.dark-theme .result-thumbnail {
-            background: #333;
-        }
-        
-        .result-thumbnail img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .result-info {
-            padding: 20px;
-        }
-        
-        .result-info h4 {
-            margin-bottom: 10px;
-            font-size: 18px;
-        }
-        
-        body.dark-theme .result-info h4 {
-            color: var(--dark-text);
-        }
-        
-        .result-info p {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 15px;
-        }
-        
-        body.dark-theme .result-info p {
-            color: #aaa;
-        }
-        
-        .result-actions {
-            display: flex;
-            justify-content: space-between;
-        }
-        
-        .result-actions button {
-            background: var(--gradient);
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .result-actions button:hover {
-            opacity: 0.9;
-        }
-        
-        .result-actions .secondary {
-            background: white;
-            color: var(--primary);
-            border: 1px solid var(--primary);
-        }
-        
-        body.dark-theme .result-actions .secondary {
-            background: var(--dark-card);
-            color: var(--primary);
-            border-color: var(--primary);
-        }
-        
-        /* CTA Section */
-        .cta-section {
-            text-align: center;
-            padding: 60px 20px;
-            background: var(--gradient);
-            border-radius: 20px;
-            color: white;
-            margin-bottom: 80px;
-        }
-        
-        .cta-section h3 {
-            font-size: 36px;
-            margin-bottom: 20px;
-        }
-        
-        .cta-section p {
-            font-size: 18px;
-            margin-bottom: 30px;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-            opacity: 0.9;
-        }
-        
-        .cta-section button {
-            background: white;
-            color: var(--primary);
-            border: none;
-            padding: 15px 30px;
-            border-radius: 50px;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        .cta-section button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-        }
-        
-        /* Footer */
-        footer {
-            background: var(--dark);
-            color: white;
-            padding: 60px 0 30px;
-        }
-        
-        body.dark-theme footer {
-            background: #111;
-        }
-        
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 40px;
-            margin-bottom: 40px;
-        }
-        
-        .footer-column h4 {
-            font-size: 18px;
-            margin-bottom: 20px;
-            position: relative;
-            padding-bottom: 10px;
-        }
-        
-        .footer-column h4::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 40px;
-            height: 2px;
-            background: var(--gradient);
-        }
-        
-        .footer-column ul {
-            list-style: none;
-        }
-        
-        .footer-column ul li {
-            margin-bottom: 10px;
-        }
-        
-        .footer-column ul li a {
-            color: #bbb;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-        
-        .footer-column ul li a:hover {
-            color: white;
-            padding-left: 5px;
-        }
-        
-        .footer-bottom {
-            text-align: center;
-            padding-top: 30px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            color: #bbb;
-            font-size: 14px;
-        }
-        
-        /* Telegram Bot Section */
-        .telegram-bot {
-            background: #0088cc;
-            color: white;
-            padding: 40px;
-            border-radius: 20px;
-            margin-bottom: 80px;
-            text-align: center;
-        }
-        
-        .telegram-bot h3 {
-            font-size: 32px;
-            margin-bottom: 20px;
-        }
-        
-        .telegram-bot p {
-            font-size: 18px;
-            margin-bottom: 30px;
-            max-width: 700px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        
-        .telegram-bot .bot-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            background: white;
-            color: #0088cc;
-            padding: 15px 25px;
-            border-radius: 50px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-        
-        .telegram-bot .bot-link:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        /* Mobile Menu */
-        .mobile-menu-btn {
             display: none;
-            background: none;
-            border: none;
-            font-size: 24px;
-            color: var(--dark);
-            cursor: pointer;
         }
-        
-        body.dark-theme .mobile-menu-btn {
-            color: var(--dark-text);
-        }
-        
-        /* PWA Install Prompt */
-        .pwa-install-prompt {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            z-index: 1000;
-            transform: translateY(150%);
-            transition: transform 0.3s ease;
-        }
-        
-        body.dark-theme .pwa-install-prompt {
-            background: var(--dark-card);
-            color: var(--dark-text);
-        }
-        
-        .pwa-install-prompt.show {
-            transform: translateY(0);
-        }
-        
-        .pwa-install-prompt img {
-            width: 40px;
-            height: 40px;
-        }
-        
-        .pwa-install-prompt button {
-            background: var(--gradient);
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            font-size: 14px;
-            cursor: pointer;
-        }
-        
-        .pwa-install-prompt button.secondary {
-            background: #eee;
-            color: var(--dark);
-        }
-        
-        body.dark-theme .pwa-install-prompt button.secondary {
-            background: #333;
-            color: var(--dark-text);
-        }
-        
-        /* Loading Animation */
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
+        progress {
             width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.9);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
+            height: 10px;
+            border-radius: 5px;
         }
-        
-        body.dark-theme .loading-overlay {
-            background: rgba(0, 0, 0, 0.9);
+        .download-links {
+            margin-top: 30px;
+            display: none;
         }
-        
-        .loading-overlay.active {
-            opacity: 1;
-            pointer-events: all;
+        .part-link {
+            display: block;
+            padding: 10px;
+            margin: 5px 0;
+            background: #f8f9fa;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #4285f4;
+            transition: background 0.2s;
         }
-        
-        .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
+        .part-link:hover {
+            background: #e8f0fe;
         }
-        
-        body.dark-theme .loading-spinner {
-            border-color: #333;
+        .status {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+            text-align: center;
         }
-        
-        .loading-overlay p {
-            color: var(--dark);
-            font-size: 18px;
-        }
-        
-        body.dark-theme .loading-overlay p {
-            color: var(--dark-text);
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        /* Responsive Styles */
-        @media (max-width: 992px) {
-            .steps::before {
-                display: none;
-            }
-            
-            .step {
-                margin-bottom: 30px;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            header {
-                flex-direction: column;
-                gap: 20px;
-            }
-            
-            nav ul {
-                gap: 15px;
-            }
-            
-            .hero h2 {
-                font-size: 36px;
-            }
-            
-            .hero p {
-                font-size: 18px;
-            }
-            
-            .url-input-container {
-                flex-direction: column;
-                background: none;
-                box-shadow: none;
-                gap: 10px;
-            }
-            
-            .url-input-container input {
-                border-radius: 50px;
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            }
-            
-            body.dark-theme .url-input-container input {
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            }
-            
-            .url-input-container button {
-                border-radius: 50px;
-                padding: 15px;
-            }
-            
-            .mobile-menu-btn {
-                display: block;
-            }
-            
-            nav {
-                position: fixed;
-                top: 0;
-                right: -100%;
-                width: 80%;
-                height: 100vh;
-                background: white;
-                box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
-                z-index: 100;
-                transition: right 0.3s ease;
-                padding: 80px 30px;
-            }
-            
-            body.dark-theme nav {
-                background: var(--dark-card);
-            }
-            
-            nav.active {
-                right: 0;
-            }
-            
-            nav ul {
-                flex-direction: column;
-                gap: 20px;
-            }
-            
-            .close-menu-btn {
-                position: absolute;
-                top: 20px;
-                right: 20px;
-                background: none;
-                border: none;
-                font-size: 24px;
-                cursor: pointer;
-                color: var(--dark);
-            }
-            
-            body.dark-theme .close-menu-btn {
-                color: var(--dark-text);
-            }
-        }
-        
-        /* Animation Classes */
-        .fade-in {
-            animation: fadeIn 1s ease-in;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        .slide-up {
-            animation: slideUp 0.8s ease-out;
-        }
-        
-        @keyframes slideUp {
-            from { transform: translateY(50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        
-        .pulse {
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+        .error {
+            color: #d32f2f;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
-    <!-- Animated Background -->
-    <div class="bg-animation">
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-    </div>
-    
-    <!-- Main Container -->
     <div class="container">
-        <!-- Header -->
-        <header>
-            <div class="logo">
-                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjNkM1Q0U3IiBkPSJNNDQ4IDI1NkM0NDggMTMwLjEgMzQxLjkgMjQgMjE2IDI0Uy0xNiAxMzAuMS0xNiAyNTZTMTAyLjEgNDg4IDIxNiA0ODhTNDQ4IDM4MS45IDQ0OCAyNTZ6Ii8+PHBhdGggZmlsbD0iIzAwQ0VGRiIgZD0iTTIxNiAyODhjLTE3LjcgMC0zMi0xNC4zLTMyLTMyczE0LjMtMzIgMzItMzJzMzIgMTQuMyAzMiAzMlMtMjMzLjcgMjg4LTIxNiAyODh6Ii8+PC9zdmc+" alt="Shortdex Logo">
-                <h1>Shortdex</h1>
-            </div>
-            
-            <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
-            
-            <nav id="mainNav">
-                <button class="close-menu-btn" id="closeMenuBtn">×</button>
-                <ul>
-                    <li><a href="#features">Возможности</a></li>
-                    <li><a href="#how-it-works">Как это работает</a></li>
-                    <li><a href="#results">Результаты</a></li>
-                    <li><a href="#pricing">Цены</a></li>
-                </ul>
-            </nav>
-            
-            <div style="display: flex; align-items: center;">
-                <button class="cta-button" id="installBtn">Установить</button>
-                <button class="theme-toggle" id="themeToggle">🌓</button>
-            </div>
-        </header>
-        
-        <!-- Hero Section -->
-        <section class="hero">
-            <h2 class="slide-up">Превратите <span>длинные видео</span> в <span>вирусные Shorts</span></h2>
-            <p class="slide-up">Вставьте ссылку на YouTube, и наш ИИ создаст 10+ увлекательных коротких клипов с субтитрами, готовых стать вирусными в YouTube Shorts!</p>
-            
-            <div class="url-input slide-up">
-                <div class="url-input-container">
-                    <input type="text" id="videoUrl" placeholder="Вставьте ссылку на YouTube видео...">
-                    <button id="processBtn">Создать Shorts</button>
-                </div>
-                <div class="supported-platforms">
-                    <div class="platform">
-                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iI0ZGMjVCMCIgZD0iTTE5LjYxNSAzLjE4OEMxNS45NjIuMTkzIDEyLjI5LjEwMiA4LjY2MyAyLjY0NmMtMS4xMjkuODU0LTIuMDYgMS44OTktMi45MjkgMy4wMzctLjg2OSAxLjEzNy0xLjUxOCAyLjM2LTIuMDI0IDMuNzA5LS41MDYgMS4zNS0uODQgMi43NzktMS4wMTcgNC4yNzQtLjE3NyAxLjQ5NS0uMTk4IDMuMDM1LS4wNjIgNC42MjIuMTM1IDEuNTg3LjQzOCAzLjIxLjkxIDQuODc1LjQ3MiAxLjY2NSAxLjA4IDMuMzU0IDEuODI3IDUuMDY3Ljc0NyAxLjcxMyAxLjY0IDMuNDE0IDIuNjg1IDUuMTAzIDEuMDQ1IDEuNjkgMi4yMjMgMy4zNDcgMy41MzMgNC45NzMgMS4zMSAxLjYyNiAyLjc3IDMuMTg5IDQuMzgxIDQuLjgwNS40NTkgMS43MzEuNjg5IDIuNzU4LjY4OSAxLjAyOCAwIDIuMDkzLS4yMyAzLjE5Ni0uNjkgMS4xMDMtLjQ2IDIuMTMtMS4xNTIgMy4wODItMi4wNzUuOTUyLS45MjMgMS43MTgtMi4wMzQgMi4yOTgtMy4zMzIuNTgtMS4yOTkuODctMi43MzYuODctNC4zMSAwLTEuNTc0LS4yOTYtMy4yNTItLjg4OC00Ljg1LS41OTItMS41OTgtMS40MzktMy4wNzctMi41NDItNC40MzYtMS4xMDMtMS4zNi0yLjQ1Ni0yLjU4My00LjA2LTMuNjctMS42MDUtMS4wODctMy40MjYtMS45OTQtNS40NjMtMi43MjItMi4wMzctLjcyOC00LjI0Mi0xLjI4OS02LjYxNS0xLjY4My0yLjM3My0uMzk0LTQuODQyLS42MzYtNy40MDgtLjcyNS0yLjU2Ni0uMDktNS4xNjYuMDM1LTcuODAxLjM3My0yLjYzNS4zMzgtNS4yMTcuODk3LTcuNzQ2IDEuNjgxLTIuNTI5Ljc4NC00Ljg5OCAxLjgxLTcuMTA4IDMuMDc4LTIuMjEuMS4wMDQtNC4zOTktMi4wMDItNi41NzktMy4wMDZ6Ii8+PC9zdmc+" alt="YouTube">
-                        YouTube
-                    </div>
-                    <div class="platform">
-                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzAwQjBGRiIgZD0iTTE5LjYxNSAzLjE4OEMxNS45NjIuMTkzIDEyLjI5LjEwMiA4LjY2MyAyLjY0NmMtMS4xMjkuODU0LTIuMDYgMS44OTktMi45MjkgMy4wMzctLjg2OSAxLjEzNy0xLjUxOCAyLjM2LTIuMDI0IDMuNzA5LS41MDYgMS4zNS0uODQgMi43NzktMS4wMTcgNC4yNzQtLjE3NyAxLjQ5NS0uMTk4IDMuMDM1LS4wNjIgNC42MjIuMTM1IDEuNTg3LjQzOCAzLjIxLjkxIDQuODc1LjQ3MiAxLjY2NSAxLjA4IDMuMzQ0IDEuODI3IDUuMDY3Ljc0NyAxLjcxMyAxLjY0IDMuNDE0IDIuNjg1IDUuMTAzIDEuMDQ1IDEuNjkgMi4yMjMgMy4zNDcgMy41MzMgNC45NzMgMS4zMSAxLjYyNiAyLjc3IDMuMTg5IDQuMzgxIDQuLjgwNS40NTkgMS43MzEuNjg5IDIuNzU4LjY4OSAxLjAyOCAwIDIuMDkzLS4yMyAzLjE5Ni0uNjkgMS4xMDMtLjQ2IDIuMTMtMS4xNTIgMy4wODItMi4wNzUuOTUyLS5yMzIgMS43MTgtMi4wMzQgMi4yOTgtMy4zMzIuNTgtMS4yOTkuODctMi43MzYuODctNC4zMSAwLTEuNTc0LS4yOTYtMy4yNTItLjg4OC00Ljg1LS41OTItMS41OTgtMS40MzktMy4wNzctMi41NDItNC40MzYtMS4xMDMtMS4zNi0yLjQ1Ni0yLjU4My00LjA2LTMuNjctMS42MDUtMS4wODctMy40MjYtMS45OTQtNS40NjMtMi43MjItMi4wMzctLjcyOC00LjI0Mi0xLjI4OS02LjYxNS0xLjY4My0yLjM3My0uMzk0LTQuODQyLS42MzYtNy40MDgtLjcyNS0yLjU2Ni0uMDktNS4xNjYuMDM1LTcuODAxLjM3My0yLjYzNS4zMzgtNS4yMTcuODk3LTcuNzQ2IDEuNjgxLTIuNTI5Ljc4NC00Ljg5OCAxLjgxLTcuMTA4IDMuMDc4LTIuMjEuMS4wMDQtNC4zOTktMi4wMDItNi41NzktMy4wMDZ6Ii8+PC9zdmc+" alt="TikTok">
-                        TikTok
-                    </div>
-                    <div class="platform">
-                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iI0ZGNjkwMCIgZD0iTTE5LjYxNSAzLjE4OEMxNS45NjIuMTkzIDEyLjI5LjEwMiA4LjY2MyAyLjY0NmMtMS4xMjkuODU0LTIuMDYgMS44OTktMi45MjkgMy4wMzctLjg2OSAxLjEzNy0xLjUxOCAyLjM2LTIuMDI0IDMuNzA5LS41MDYgMS4zNS0uODQgMi43NzktMS4wMTcgNC4yNzQtLjE3NyAxLjQ5NS0uMTk4IDMuMDM1LS4wNjIgNC42MjIuMTM1IDEuNTg3LjQzOCAzLjIxLjkxIDQuODc1LjQ3MiAxLjY2NSAxLjA4IDMuMzQ0IDEuODI3IDUuMDY3Ljc0NyAxLjcxMyAxLjY0IDMuNDE0IDIuNjg1IDUuMTAzIDEuMDQ1IDEuNjkgMi4yMjMgMy4zNDcgMy41MzMgNC45NzMgMS4zMSAxLjYyNiAyLjc3IDMuMTg5IDQuMzgxIDQuLjgwNS40NTkgMS43MzEuNjg5IDIuNzU4LjY4OSAxLjAyOCAwIDIuMDkzLS4yMyAzLjE5Ni0uNjkgMS4xMDMtLjQ2IDIuMTMtMS4xNTIgMy4wODItMi4wNzUuOTUyLS45MjMgMS43MTgtMi4wMzQgMi4yOTgtMy4zMzIuNTgtMS4yOTkuODctMi43MzYuODctNC4zMSAwLTEuNTc0LS4yOTYtMy4yNTItLjg4OC00Ljg1LS41OTItMS41OTgtMS40MzktMy4wNzctMi41NDItNC40MzYtMS4xMDMtMS4zNi0yLjQ1Ni0yLjU4My00LjA2LTMuNjctMS42MDUtMS4wODctMy40MjYtMS45OTQtNS40NjMtMi43MjItMi4wMzctLjcyOC00LjI0Mi0xLjI4OS02LjYxNS0xLjY4My0yLjM3My0uMzk0LTQuODQyLS42MzYtNy40MDgtLjcyNS0yLjU2Ni0uMDktNS4xNjYuMDM1LTcuODAxLjM3My0yLjYzNS4zMzgtNS4yMTcuODk3LTcuNzQ2IDEuNjgxLTIuNTI5Ljc4NC00Ljg5OCAxLjgxLTcuMTA4IDMuMDc4LTIuMjEuMS4wMDQtNC4zOTktMi4wMDItNi41NzktMy4wMDZ6Ii8+PC9zdmc+" alt="Instagram">
-                        Instagram
-                    </div>
-                    <div class="platform">
-                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzAwQjBGRiIgZD0iTTE5LjYxNSAzLjE4OEMxNS45NjIuMTkzIDEyLjI5LjEwMiA4LjY2MyAyLjY0NmMtMS4xMjkuODU0LTIuMDYgMS44OTktMi45MjkgMy4wMzctLjg2OSAxLjEzNy0xLjUxOCAyLjM2LTIuMDI0IDMuNzA5LS41MDYgMS4zNS0uODQgMi43NzktMS4wMTcgNC4yNzQtLjE3NyAxLjQ5NS0uMTk4IDMuMDM1LS4wNjIgNC42MjIuMTM1IDEuNTg3LjQzOCAzLjIxLjkxIDQuODc1LjQ3MiAxLjY2NSAxLjA4IDMuMzQ0IDEuODI3IDUuMDY3Ljc0NyAxLjcxMyAxLjY0IDMuNDE0IDIuNjg1IDUuMTAzIDEuMDQ1IDEuNjkgMi4yMjMgMy4zNDcgMy41MzMgNC45NzMgMS4zMSAxLjYyNiAyLjc3IDMuMTg5IDQuMzgxIDQuLjgwNS40NTkgMS43MzEuNjg5IDIuNzU4LjY4OSAxLjAyOCAwIDIuMDkzLS4yMyAzLjE5Ni0uNjkgMS4xMDMtLjQ2IDIuMTMtMS4xNTIgMy4wODItMi4wNzUuOTUyLS45MjMgMS43MTgtMi4wMzQgMi4yOTgtMy4zMzIuNTgtMS4yOTkuODctMi43MzYuODctNC4zMSAwLTEuNTc0LS4yOTYtMy4yNTItLjg4OC00Ljg1LS41OTItMS41OTgtMS40MzktMy4wNzctMi41NDItNC40MzYtMS4xMDMtMS4zNi0yLjQ1Ni0yLjU4My00LjA2LTMuNjctMS42MDUtMS4wODctMy40MjYt1Ljk5NC01LjQ2My0yLjcyMi0yLjAzNy0uNzI4LTQuMjQyLTEuMjg5LTYuNjE1LTEuNjgzLTIuMzczLS4zOTQtNC44NDItLjYzNi03LjQwOC0uNzI1LTIuNTY2LS4wOS01LjE2Ni4wMzUtNy44MDEuMzczLTIuNjM1LjMzOC01LjIxNy44OTctNy43NDYgMS42ODEtMi41MjkuNzg0LTQuODk4IDEuODEtNy4xMDggMy4wNzgtMi4yMS4xLjAwNC00LjM5OS0yLjAwMi02LjU3OS0zLjAwNnoiLz48L3N2Zz4=" alt="Facebook">
-                        Facebook
-                    </div>
-                </div>
-            </div>
-        </section>
-        
-        <!-- Telegram Bot Section -->
-        <section class="telegram-bot">
-            <h3>Наш Telegram бот</h3>
-            <p>Используйте нашего бота для быстрого создания Shorts прямо в Telegram! Просто отправьте ссылку на видео и получите готовые клипы.</p>
-            <a href="https://t.me/shortdex_bot" class="bot-link" target="_blank">
-                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzAwODhjYyIgZD0iTTkuNzgsMTguNjVMMTAuMDYsMTQuNTZMMTcuNzQsNy44NkMxOC4wOCw3LjUzIDE3LjY3LDcuMzkgMTcuLjIyLDcuNjZMNy43NCwxMy4zTDQuMTIsMTIuMTVDMy4yLDEyLjA0IDMuMTUsMTEuMDkgNC4xLDEwLjcxTDE5LjI3LDQuMTlDMTkuOTQsMy44NyAyMC42OSw0LjM1IDE5LjY2LDYuMjhMMTguNjYsOC4yNEwxNi41LDE1LjQyQzE2LjI2LDE2LjI3IDE1LjUsMTYuNDEgMTQuODcsMTYuMDhMMTEuNzYsMTMuODhMOSNzLDE4LjY1QzguODksMTkuMzkgOC4xMSwxOS42NSA3LjQ0LDE5LjE5QzYuNzYsMTguNzIgNi43MiwxNy44MyA3LjM4LDE3LjM1TDkuNzgsMTguNjVWMTguNjVaIi8+PC9zdmc+" alt="Telegram" width="20">
-                @ShortdexBot
-            </a>
-        </section>
-        
-        <!-- Features Section -->
-        <section class="features" id="features">
-            <div class="section-title">
-                <h3 class="slide-up">Мощные возможности ИИ</h3>
-                <p class="slide-up">Наши продвинутые алгоритмы делают всю работу по созданию идеальных коротких клипов</p>
-            </div>
-            
-            <div class="features-grid">
-                <div class="feature-card fade-in">
-                    <div class="feature-icon">
-                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xMiAxNUMxMy42NiAxNSAxNS4xMyAxNi4zNSAxNS43NCAxOEg4LjI2QzguODcgMTYuMzUgMTAuMzQgMTUgMTIgMTVNOSAxM0M5IDEyLjQ1IDkuNDUgMTIgMTAgMTJDMTEuNjYgMTIgMTMgMTAuNjYgMTMgOUMxMyA3LjM0IDExLjY2IDYgMTAgNkM5LjQ1IDYgOSA2LjQ1IDkgN0M5IDcuNTUgOS40NSA4IDEwIDhDMTAuNTUgOCAxMSA3LjU1IDExIDdDMTEgOC4xIDEwLjEgOSAxMCA5QzkuOSA5IDkgOC4xIDkgN0M5IDUuMjcgMTAuMjcgNCAxMiA0QzEzLjczIDQgMTUgNS4yNyAxNSA3QzE1IDguNzMgMTMuNzMgMTAgMTIgMTBDMTEuNDUgMTAgMTEgMTAuNDUgMTEgMTFDMTEgMTEuNTUgMTEuNDUgMTIgMTIgMTJDMTIuNTUgMTIgMTMgMTEuNTUgMTMgMTFDMTMgMTIuNjYgMTEuNjYgMTQgMTAgMTRDOC4zNCAxNCA3IDEyLjY2IDcgMTFDNyA5LjM0IDguMzQgOCAxMCA4QzEwLjE5IDggMTAuMzcgOC4wNCAxMC41MyA4LjA5QzkuNzIgOC4yNCA5IDEzIDkgMTNIN0wxMiAxOUwxNyAxM0gxNUMxNSAxMyAxNC4yOCA4LjI0IDEzLjQ3IDguMDlDMTMuNjMgOC4wNCAxMy44MSA4IDE0IDhDMTUuNjYgOCAxNyA5LjM0IDE3IDExQzE3IDEyLjY2IDE1LjY2IDE0IDE0IDE0QzEzLjQ1IDE0IDEzIDEzLjU1IDEzIDEzQzEzIDEyLjQ1IDEzLjQ1IDEyIDE0IDEyQzE0LjU1IDEyIDE1IDEyLjQ1IDE1IDEzQzE1IDE0LjczIDEzLjczIDE2IDEyIDE2QzEwLjI3IDE2IDkgMTQuNzMgOSAxM1oiLz48L3N2Zz4=" alt="Language Detection">
-                    </div>
-                    <h4>Автоопределение языка</h4>
-                    <p>Наш ИИ автоматически определяет язык в вашем видео и генерирует точные субтитры на том же языке или любом другом языке, который вы выберете.</p>
-                </div>
-                
-                <div class="feature-card fade-in" style="animation-delay: 0.2s;">
-                    <div class="feature-icon">
-                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xOCA5VjVIMTZWM0g4VjVINlY5SDJWMjFIMjJWOUgxOE0xNiA5SDEwVjVIMTZWOU0yMCAxOVYxMUg0VjE5SDIwWiIvPjwvc3ZnPg==" alt="Clip Creation">
-                    </div>
-                    <h4>Умное создание клипов</h4>
-                    <p>Из 30-минутного видео мы выделяем и извлекаем 10 самых захватывающих моментов, которые идеально подходят для Shorts/Reels/TikTok.</p>
-                </div>
-                
-                <div class="feature-card fade-in" style="animation-delay: 0.4s;">
-                    <div class="feature-icon">
-                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xOSAxM1YxOUg1VjVIMTFWMUgNVYzSDNWMjFIMTlWMTlIMjFWMTNIMTlNMTQgMFYxMkwxNyA5TDIwIDEyTDEyIDIwTDguNjcgMTYuNjdMNSUyMC41VjE2TDExIDEyTDguNjcgOS42NkwxNCAwWiIvPjwvc3ZnPg==" alt="Viral Optimization">
-                    </div>
-                    <h4>Оптимизация для виральности</h4>
-                    <p>Каждый клип оптимизирован с идеальным таймингом, субтитрами и эффектами для максимального вовлечения и потенциала распространения.</p>
-                </div>
-            </div>
-        </section>
-        
-        <!-- How It Works Section -->
-        <section class="how-it-works" id="how-it-works">
-            <div class="section-title">
-                <h3 class="slide-up">Как работает Shortdex</h3>
-                <p class="slide-up">Создавайте вирусные Shorts всего за 3 простых шага</p>
-            </div>
-            
-            <div class="steps">
-                <div class="step slide-up">
-                    <div class="step-number">1</div>
-                    <h4>Вставьте ссылку на видео</h4>
-                    <p>Скопируйте и вставьте ссылку на любое YouTube видео, которое вы хотите преобразовать в Shorts.</p>
-                </div>
-                
-                <div class="step slide-up" style="animation-delay: 0.2s;">
-                    <div class="step-number">2</div>
-                    <h4>ИИ обрабатывает видео</h4>
-                    <p>Наш ИИ анализирует видео, находит ключевые моменты и создает идеальные клипы.</p>
-                </div>
-                
-                <div class="step slide-up" style="animation-delay: 0.4s;">
-                    <div class="step-number">3</div>
-                    <h4>Скачивайте и делитесь</h4>
-                    <p>Скачайте готовые к публикации Shorts или поделитесь ими напрямую в социальных сетях.</p>
-                </div>
-            </div>
-        </section>
-        
-        <!-- Results Preview -->
-        <section class="results-preview" id="results">
-            <div class="section-title">
-                <h3 class="slide-up">Ваши вирусные Shorts готовы</h3>
-                <p class="slide-up">Вот что наш ИИ может создать из ваших видео</p>
-            </div>
-            
-            <div class="results-container">
-                <div class="result-card fade-in">
-                    <div class="result-thumbnail">
-                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iI2VlZSIgZD0iTTE5IDNINUMzLjkgMyAzIDMuOSAzIDV2MTRjMCAxLjEgLjkgMiAyIDJoMTRjMS4xIDAgMi0uOSAyLTJWNWMwLTEuMS0uOS0yLTItMnoiLz48cGF0aCBmaWxsPSIjY2NjIiBkPSJNMTAgMTZsNS01LTMtMy01IDV6Ii8+PC9zdmc+" alt="Result Preview">
-                    </div>
-                    <div class="result-info">
-                        <h4>Шокирующая правда раскрыта</h4>
-                        <p>0:15 • Русский • 1080p</p>
-                        <div class="result-actions">
-                            <button>Скачать</button>
-                            <button class="secondary">Редактировать</button>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="result-card fade-in" style="animation-delay: 0.2s;">
-                    <div class="result-thumbnail">
-                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iI2VlZSIgZD0iTTE5IDNINUMzLjkgMyAzIDMuOSAzIDV2MTRjMCAxLjEgLjkgMiAyIDJoMTRjMS4xIDAgMi0uOSAyLTJWNWMwLTEuMS0uOS0yLTItMnoiLz48cGF0aCBmaWxsPSIjY2NjIiBkPSJNMTAgMTZsNS01LTMtMy01IDV6Ii8+PC9zdmc+" alt="Result Preview">
-                    </div>
-                    <div class="result-info">
-                        <h4>Вы не поверите в это</h4>
-                        <p>0:12 • Русский • 1080p</p>
-                        <div class="result-actions">
-                            <button>Скачать</button>
-                            <button class="secondary">Редактировать</button>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="result-card fade-in" style="animation-delay: 0.4s;">
-                    <div class="result-thumbnail">
-                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iI2VlZSIgZD0iTTE5IDNINUMzLjkgMyAzIDMuOSAzIDV2MTRjMCAxLjEgLjkgMiAyIDJoMTRjMS4xIDAgMi0uOSAyLTJWNWMwLTEuMS0uOS0yLTItMnoiLz48cGF0aCBmaWxsPSIjY2NjIiBkPSJNMTAgMTZsNS01LTMtMy01IDV6Ii8+PC9zdmc+" alt="Result Preview">
-                    </div>
-                    <div class="result-info">
-                        <h4>Это изменит всё</h4>
-                        <p>0:18 • Русский • 1080p</p>
-                        <div class="result-actions">
-                            <button>Скачать</button>
-                            <button class="secondary">Редактировать</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        
-        <!-- CTA Section -->
-        <section class="cta-section pulse">
-            <h3>Готовы стать вирусными?</h3>
-            <p>Начните создавать привлекающие внимание Shorts из любого видео за секунды. Никаких навыков редактирования не требуется!</p>
-            <button id="mainCtaBtn">Создать Shorts сейчас</button>
-        </section>
-    </div>
-    
-    <!-- Footer -->
-    <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-column">
-                    <h4>Shortdex</h4>
-                    <ul>
-                        <li><a href="#">О нас</a></li>
-                        <li><a href="#">Карьера</a></li>
-                        <li><a href="#">Пресса</a></li>
-                        <li><a href="#">Блог</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-column">
-                    <h4>Продукт</h4>
-                    <ul>
-                        <li><a href="#">Возможности</a></li>
-                        <li><a href="#">Цены</a></li>
-                        <li><a href="#">API</a></li>
-                        <li><a href="#">Интеграции</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-column">
-                    <h4>Ресурсы</h4>
-                    <ul>
-                        <li><a href="#">Центр помощи</a></li>
-                        <li><a href="#">Обучение</a></li>
-                        <li><a href="#">Сообщество</a></li>
-                        <li><a href="#">Вебинары</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-column">
-                    <h4>Правовая информация</h4>
-                    <ul>
-                        <li><a href="#">Конфиденциальность</a></li>
-                        <li><a href="#">Условия</a></li>
-                        <li><a href="#">Политика cookies</a></li>
-                        <li><a href="#">GDPR</a></li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="footer-bottom">
-                <p>&copy; 2023 Shortdex. Все права защищены.</p>
-            </div>
+        <h1>Video Split Downloader</h1>
+        <div class="input-group">
+            <input type="url" id="videoUrl" placeholder="Введите URL видео" required>
         </div>
-    </footer>
-    
-    <!-- PWA Install Prompt -->
-    <div class="pwa-install-prompt" id="pwaInstallPrompt">
-        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjNkM1Q0U3IiBkPSJNNDQ4IDI1NkM0NDggMTMwLjEgMzQxLjkgMjQgMjE2IDI0Uy0xNiAxMzAuMS0xNiAyNTZTMTAyLjEgNDg4IDIxNiA0ODhTNDQ4IDM4MS45IDQ0OCAyNTZ6Ii8+PHBhdGggZmlsbD0iIzAwQ0VGRiIgZD0iTTIxNiAyODhjLTE3LjcgMC0zMi0xNC4zLTMyLTMyczE4LjMtMzIgMzItMzJzMzIgMTQuMyAzMiAzMlMtMjMzLjcgMjg4LTIxNiAyODh6Ii8+PC9zdmc+" alt="Shortdex Icon">
-        <div>
-            <p>Установите Shortdex для быстрого создания клипов</p>
-            <div style="display: flex; gap: 10px; margin-top: 10px;">
-                <button id="installCancelBtn" class="secondary">Не сейчас</button>
-                <button id="installConfirmBtn">Установить</button>
-            </div>
+        <button id="downloadBtn">Скачать и разделить</button>
+        <div class="progress-container" id="progressContainer">
+            <progress id="downloadProgress" value="0" max="100"></progress>
+            <div class="status" id="statusText">Подготовка к загрузке...</div>
+        </div>
+        <div class="error" id="errorText"></div>
+        <div class="download-links" id="downloadLinks">
+            <h3>Части видео:</h3>
+            <div id="partsList"></div>
         </div>
     </div>
-    
-    <!-- Loading Overlay -->
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-spinner"></div>
-        <p>Обработка вашего видео...</p>
-    </div>
-    
+
     <script>
-        // Mobile Menu Toggle
-        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        const closeMenuBtn = document.getElementById('closeMenuBtn');
-        const mainNav = document.getElementById('mainNav');
-        
-        mobileMenuBtn.addEventListener('click', () => {
-            mainNav.classList.add('active');
-        });
-        
-        closeMenuBtn.addEventListener('click', () => {
-            mainNav.classList.remove('active');
-        });
-        
-        // Smooth Scrolling for Anchor Links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
-                e.preventDefault();
-                
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
-                
-                // Close mobile menu if open
-                mainNav.classList.remove('active');
-            });
-        });
-        
-        // Process Button Click
-        const processBtn = document.getElementById('processBtn');
-        const videoUrl = document.getElementById('videoUrl');
-        const loadingOverlay = document.getElementById('loadingOverlay');
-        const mainCtaBtn = document.getElementById('mainCtaBtn');
-        
-        function processVideo() {
-            const url = videoUrl.value.trim();
-            
-            if (!url) {
-                alert('Пожалуйста, введите ссылку на YouTube видео');
+        document.getElementById('downloadBtn').addEventListener('click', async function() {
+            const videoUrl = document.getElementById('videoUrl').value;
+            if (!videoUrl) {
+                showError('Пожалуйста, введите URL видео');
                 return;
             }
-            
-            // Validate YouTube URL
-            if (!url.match(/^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$/)) {
-                alert('Пожалуйста, введите корректную ссылку на YouTube');
-                return;
-            }
-            
-            // Show loading
-            loadingOverlay.classList.add('active');
-            
-            // Send to Telegram bot
-            sendToTelegramBot(url);
-            
-            // Simulate processing (in a real app, this would call your backend/API)
-            setTimeout(() => {
-                loadingOverlay.classList.remove('active');
-                
-                // Scroll to results section
-                document.getElementById('results').scrollIntoView({
-                    behavior: 'smooth'
-                });
-                
-                // In a real app, you would display the actual results from your API
-            }, 3000);
-        }
-        
-        processBtn.addEventListener('click', processVideo);
-        mainCtaBtn.addEventListener('click', () => {
-            videoUrl.focus();
-        });
-        
-        // Allow pressing Enter in the input field
-        videoUrl.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                processVideo();
-            }
-        });
-        
-        // PWA Installation
-        let deferredPrompt;
-        const installBtn = document.getElementById('installBtn');
-        const pwaInstallPrompt = document.getElementById('pwaInstallPrompt');
-        const installConfirmBtn = document.getElementById('installConfirmBtn');
-        const installCancelBtn = document.getElementById('installCancelBtn');
-        
-        window.addEventListener('beforeinstallprompt', (e) => {
-            // Prevent the mini-infobar from appearing on mobile
-            e.preventDefault();
-            // Stash the event so it can be triggered later.
-            deferredPrompt = e;
-            // Show the install button
-            installBtn.style.display = 'block';
-            
-            // Show our custom install prompt (after a delay)
-            setTimeout(() => {
-                pwaInstallPrompt.classList.add('show');
-            }, 5000);
-        });
-        
-        installBtn.addEventListener('click', () => {
-            if (deferredPrompt) {
-                // Show the install prompt
-                deferredPrompt.prompt();
-                // Wait for the user to respond to the prompt
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('User accepted the install prompt');
-                    } else {
-                        console.log('User dismissed the install prompt');
-                    }
-                    deferredPrompt = null;
-                });
-            }
-        });
-        
-        installConfirmBtn.addEventListener('click', () => {
-            pwaInstallPrompt.classList.remove('show');
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('User accepted the install prompt');
-                    } else {
-                        console.log('User dismissed the install prompt');
-                    }
-                    deferredPrompt = null;
-                });
-            }
-        });
-        
-        installCancelBtn.addEventListener('click', () => {
-            pwaInstallPrompt.classList.remove('show');
-        });
-        
-        // Service Worker Registration for PWA
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').then(registration => {
-                    console.log('ServiceWorker registration successful');
-                }).catch(err => {
-                    console.log('ServiceWorker registration failed: ', err);
-                });
-            });
-        }
-        
-        // Telegram Bot Integration
-        function sendToTelegramBot(videoUrl) {
-            // Replace with your actual bot token and chat ID
-            const botToken = '7620557196:AAGywZYN6RbgEvIWNQa6tfYRx6t0jI-QyWk';
-            const chatId = 'YOUR_CHAT_ID'; // You would need to get this from your bot
-            
-            // In a real implementation, you would send this to your backend
-            // which would then forward to Telegram bot API
-            console.log('Sending to Telegram bot:', videoUrl);
-            
-            // Example fetch (would need CORS setup or backend proxy)
-            /*
-            fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    chat_id: chatId,
-                    text: `Новый запрос на обработку видео: ${videoUrl}`
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Message sent to Telegram:', data);
-            })
-            .catch(error => {
-                console.error('Error sending to Telegram:', error);
-            });
-            */
-        }
-        
-        // Theme Toggle
-        const themeToggle = document.getElementById('themeToggle');
-        const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
-        
-        // Check for saved theme or use preferred color scheme
-        const currentTheme = localStorage.getItem('theme');
-        if (currentTheme === 'dark' || (!currentTheme && prefersDarkScheme.matches)) {
-            document.body.classList.add('dark-theme');
-            themeToggle.textContent = '☀️';
-        }
-        
-        themeToggle.addEventListener('click', () => {
-            document.body.classList.toggle('dark-theme');
-            const theme = document.body.classList.contains('dark-theme') ? 'dark' : 'light';
-            localStorage.setItem('theme', theme);
-            themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
-        });
-        
-        // Animation on scroll
-        const animateOnScroll = () => {
-            const elements = document.querySelectorAll('.slide-up, .fade-in');
-            
-            elements.forEach(element => {
-                const elementPosition = element.getBoundingClientRect().top;
-                const screenPosition = window.innerHeight / 1.3;
-                
-                if (elementPosition < screenPosition) {
-                    element.style.opacity = '1';
-                    element.style.transform = 'translateY(0)';
-                }
-            });
-        };
-        
-        window.addEventListener('scroll', animateOnScroll);
-        // Initial check in case elements are already in view
-        animateOnScroll();
-    </script>
-    
-    <!-- Inline Service Worker (for PWA) -->
-    <script id="service-worker">
-        // This would normally be in a separate sw.js file, but we're inlining it for GitHub Pages compatibility
-        if ('serviceWorker' in navigator) {
-            const swContent = `
-                const CACHE_NAME = 'shortdex-v1';
-                const urlsToCache = [
-                    '/',
-                    '/index.html',
-                    '/styles.css',
-                    '/app.js',
-                    'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjNkM1Q0U3IiBkPSJNNDQ4IDI1NkM0NDggMTMwLjEgMzQxLjkgMjQgMjE2IDI0Uy0xNiAxMzAuMS0xNiAyNTZTMTAyLjEgNDg4IDIxNiA0ODhTNDQ4IDM4MS45IDQ0OCAyNTZ6Ii8+PHBhdGggZmlsbD0iIzAwQ0VGRiIgZD0iTTIxNiAyODhjLTE3LjcgMC0zMi0xNC4zLTMyLTMyczE0LjMtMzIgMzItMzJzMzIgMTQuMyAzMiAzMlMtMjMzLjcgMjg4LTIxNiAyODh6Ii8+PC9zdmc+'
-                ];
 
-                self.addEventListener('install', event => {
-                    event.waitUntil(
-                        caches.open(CACHE_NAME)
-                            .then(cache => {
-                                return cache.addAll(urlsToCache);
-                            })
-                    );
-                });
+            const btn = this;
+            const progressContainer = document.getElementById('progressContainer');
+            const progressBar = document.getElementById('downloadProgress');
+            const statusText = document.getElementById('statusText');
+            const errorText = document.getElementById('errorText');
+            const downloadLinks = document.getElementById('downloadLinks');
+            const partsList = document.getElementById('partsList');
 
-                self.addEventListener('fetch', event => {
-                    event.respondWith(
-                        caches.match(event.request)
-                            .then(response => {
-                                // Cache hit - return response
-                                if (response) {
-                                    return response;
-                                }
-                                return fetch(event.request);
-                            }
-                        )
-                    );
-                });
-            `;
-            
-            const blob = new Blob([swContent], { type: 'application/javascript' });
-            const swUrl = URL.createObjectURL(blob);
-            
-            navigator.serviceWorker.register(swUrl).then(registration => {
-                console.log('ServiceWorker registration successful');
-            }).catch(err => {
-                console.log('ServiceWorker registration failed: ', err);
-            });
-        }
-    </script>
-    
-    <!-- Web App Manifest -->
-    <script id="web-app-manifest">
-        // This would normally be in a separate manifest.webmanifest file
-        const manifest = {
-            "name": "Shortdex",
-            "short_name": "Shortdex",
-            "start_url": "/",
-            "display": "standalone",
-            "background_color": "#F5F6FA",
-            "theme_color": "#6C5CE7",
-            "description": "Преобразуйте длинные видео в вирусные Shorts с помощью ИИ",
-            "icons": [
-                {
-                    "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjNkM1Q0U3IiBkPSJNNDQ4IDI1NkM0NDggMTMwLjEgMzQxLjkgMjQgMjE2IDI0Uy0xNiAxMzAuMS0xNiAyNTZTMTAyLjEgNDg4IDIxNiA0ODhTNDQ4IDM4MS45IDQ0OCAyNTZ6Ii8+PHBhdGggZmlsbD0iIzAwQ0VGRiIgZD0iTTIxNiAyODhjLTE3LjcgMC0zMi0xNC4zLTMyLTMyczE0LjMtMzIgMzItMzJzMzIgMTQuMyAzMiAzMlMtMjMzLjcgMjg4LTIxNiAyODh6Ii8+PC9zdmc+",
-                    "sizes": "512x512",
-                    "type": "image/svg+xml"
-                },
-                {
-                    "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjNkM1Q0U3IiBkPSJNNDQ4IDI1NkM0NDggMTMwLjEgMzQxLjkgMjQgMjE2IDI0Uy0xNiAxMzAuMS0xNiAyNTZTMTAyLjEgNDg4IDIxNiA0ODhTNDQ4IDM4MS45IDQ0OCAyNTZ6Ii8+PHBhdGggZmlsbD0iIzAwQ0VGRiIgZD0iTTIxNiAyODhjLTE3LjcgMC0zMi0xNC4zLTMyLTMyczE0LjMtMzIgMzItMzJzMzIgMTQuMyAzMiAzMlMtMjMzLjcgMjg4LTIxNiAyODh6Ii8+PC9zdmc+",
-                    "sizes": "192x192",
-                    "type": "image/svg+xml"
+            // Reset UI
+            btn.disabled = true;
+            errorText.textContent = '';
+            progressContainer.style.display = 'block';
+            downloadLinks.style.display = 'none';
+            partsList.innerHTML = '';
+
+            try {
+                statusText.textContent = 'Получение информации о видео...';
+                
+                // Создаем временный файл для загрузки
+                const response = await fetch(videoUrl);
+                if (!response.ok) throw new Error('Не удалось загрузить видео');
+                
+                const contentLength = response.headers.get('content-length');
+                const filename = getFilenameFromUrl(videoUrl) || 'video.mp4';
+                
+                // Читаем поток данных
+                const reader = response.body.getReader();
+                let receivedLength = 0;
+                let partNumber = 1;
+                let currentPartSize = 0;
+                const partSize = 100 * 1024 * 1024; // 100MB per part
+                let chunks = [];
+                
+                statusText.textContent = 'Загрузка и разделение видео...';
+                
+                while(true) {
+                    const {done, value} = await reader.read();
+                    if (done) break;
+                    
+                    chunks.push(value);
+                    receivedLength += value.length;
+                    currentPartSize += value.length;
+                    
+                    // Обновляем прогресс
+                    if (contentLength) {
+                        const percent = Math.round((receivedLength / contentLength) * 100);
+                        progressBar.value = percent;
+                        statusText.textContent = `Загружено ${formatBytes(receivedLength)} из ${formatBytes(contentLength)} (${percent}%)`;
+                    }
+                    
+                    // Если накопилось достаточно данных для части
+                    if (currentPartSize >= partSize || done) {
+                        const partBlob = new Blob(chunks);
+                        const partUrl = URL.createObjectURL(partBlob);
+                        
+                        // Создаем ссылку для скачивания части
+                        const partLink = document.createElement('a');
+                        partLink.href = partUrl;
+                        partLink.download = `${filename}.part${partNumber}`;
+                        partLink.className = 'part-link';
+                        partLink.textContent = `Часть ${partNumber} (${formatBytes(currentPartSize)})`;
+                        partsList.appendChild(partLink);
+                        
+                        // Подготавливаем для следующей части
+                        chunks = [];
+                        currentPartSize = 0;
+                        partNumber++;
+                    }
                 }
-            ]
-        };
+                
+                // Если остались данные
+                if (chunks.length > 0) {
+                    const partBlob = new Blob(chunks);
+                    const partUrl = URL.createObjectURL(partBlob);
+                    
+                    const partLink = document.createElement('a');
+                    partLink.href = partUrl;
+                    partLink.download = `${filename}.part${partNumber}`;
+                    partLink.className = 'part-link';
+                    partLink.textContent = `Часть ${partNumber} (${formatBytes(currentPartSize)})`;
+                    partsList.appendChild(partLink);
+                }
+                
+                downloadLinks.style.display = 'block';
+                statusText.textContent = 'Загрузка завершена!';
+            } catch (error) {
+                showError(`Ошибка: ${error.message}`);
+            } finally {
+                btn.disabled = false;
+            }
+        });
         
-        // Create a link element for the manifest
-        const link = document.createElement('link');
-        link.rel = 'manifest';
-        link.href = 'data:application/manifest+json,' + encodeURIComponent(JSON.stringify(manifest));
-        document.head.appendChild(link);
+        function showError(message) {
+            document.getElementById('errorText').textContent = message;
+        }
+        
+        function getFilenameFromUrl(url) {
+            try {
+                const parsedUrl = new URL(url);
+                const pathname = parsedUrl.pathname;
+                return pathname.split('/').pop();
+            } catch {
+                return null;
+            }
+        }
+        
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
     </script>
 </body>
 </html>
