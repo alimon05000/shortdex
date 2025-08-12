@@ -3,288 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#4285f4">
-    <title>Universal Video Downloader</title>
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icon-192.png">
+    <title>Video Downloader</title>
     <style>
-        :root {
-            --primary: #4285f4;
-            --error: #ea4335;
-            --success: #34a853;
-            --bg: #f8f9fa;
-            --card: #ffffff;
-            --text: #202124;
-        }
-        * {
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        }
         body {
-            background: var(--bg);
-            color: var(--text);
-            margin: 0;
-            padding: 20px;
-            line-height: 1.6;
-        }
-        .container {
+            font-family: Arial, sans-serif;
             max-width: 800px;
             margin: 0 auto;
-            background: var(--card);
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            padding: 20px;
         }
-        h1 {
-            color: var(--primary);
-            text-align: center;
-            margin-bottom: 24px;
-        }
-        .input-group {
-            margin-bottom: 20px;
+        iframe {
+            width: 100%;
+            height: 500px;
+            border: none;
+            border-radius: 10px;
         }
         input {
             width: 100%;
-            padding: 14px 16px;
-            border: 1px solid #ddd;
-            border-radius: 12px;
-            font-size: 16px;
-            margin-bottom: 12px;
+            padding: 10px;
+            margin: 10px 0;
         }
         button {
-            width: 100%;
-            background: var(--primary);
+            background: #4285f4;
             color: white;
             border: none;
-            padding: 14px;
-            border-radius: 12px;
-            font-size: 17px;
-            font-weight: 500;
+            padding: 10px 20px;
+            border-radius: 5px;
             cursor: pointer;
-            margin-bottom: 16px;
-        }
-        button:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-        .progress {
-            margin: 20px 0;
-            display: none;
-        }
-        progress {
-            width: 100%;
-            height: 8px;
-            border-radius: 4px;
-        }
-        .status {
-            text-align: center;
-            color: #666;
-            font-size: 14px;
-            margin-top: 8px;
-        }
-        .error {
-            color: var(--error);
-            text-align: center;
-            margin: 12px 0;
-            display: none;
-        }
-        .result {
-            margin-top: 24px;
-            display: none;
-        }
-        video {
-            width: 100%;
-            border-radius: 12px;
-            margin-bottom: 16px;
-            background: #000;
-        }
-        .quality-selector {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 16px;
-            border: 1px solid #ddd;
-        }
-        .platforms {
-            display: flex;
-            justify-content: center;
-            gap: 16px;
-            margin-top: 24px;
-        }
-        .platform {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-        .install-btn {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--card);
-            padding: 12px 24px;
-            border-radius: 50px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            display: none;
-            z-index: 100;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Universal Video Downloader</h1>
-        
-        <div class="input-group">
-            <input type="url" id="videoUrl" placeholder="Вставьте ссылку на видео (YouTube, Instagram, TikTok и др.)">
-            <button id="downloadBtn">Скачать видео</button>
-        </div>
-        
-        <div class="error" id="errorText"></div>
-        
-        <div class="progress" id="progressContainer">
-            <progress id="progressBar" value="0" max="100"></progress>
-            <div class="status" id="statusText">Подготовка...</div>
-        </div>
-        
-        <div class="result" id="resultContainer">
-            <video controls id="videoPlayer"></video>
-            <select class="quality-selector" id="qualitySelector"></select>
-            <button id="saveBtn">Сохранить видео</button>
-        </div>
-        
-        <div class="platforms">
-            <img src="https://www.youtube.com/favicon.ico" class="platform" alt="YouTube">
-            <img src="https://www.instagram.com/favicon.ico" class="platform" alt="Instagram">
-            <img src="https://www.tiktok.com/favicon.ico" class="platform" alt="TikTok">
-        </div>
-    </div>
+    <h1>Universal Video Downloader</h1>
+    <input type="url" id="videoUrl" placeholder="Вставьте ссылку на видео">
+    <button onclick="downloadVideo()">Скачать</button>
     
-    <button class="install-btn" id="installBtn">Установить приложение</button>
+    <iframe id="downloaderFrame" 
+            src="https://loader.to/api/card/?url="
+            allowfullscreen>
+    </iframe>
 
     <script>
-        // PWA Installation
-        let deferredPrompt;
-        
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            document.getElementById('installBtn').style.display = 'block';
-        });
-        
-        document.getElementById('installBtn').addEventListener('click', async () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') {
-                    document.getElementById('installBtn').style.display = 'none';
-                }
-                deferredPrompt = null;
-            }
-        });
-        
-        // Service Worker Registration
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then(registration => console.log('SW registered'))
-                    .catch(err => console.log('SW registration failed: ', err));
-            });
-        }
-        
-        // Video Download Logic
-        document.getElementById('downloadBtn').addEventListener('click', async () => {
-            const url = document.getElementById('videoUrl').value.trim();
-            if (!url) {
-                showError('Введите URL видео');
-                return;
-            }
+        function downloadVideo() {
+            const url = document.getElementById('videoUrl').value;
+            if (!url) return alert('Введите URL видео');
             
-            resetUI();
-            document.getElementById('downloadBtn').disabled = true;
-            document.getElementById('progressContainer').style.display = 'block';
-            document.getElementById('statusText').textContent = 'Обработка ссылки...';
-            
-            try {
-                // Используем CORS-прокси для обхода ограничений
-                const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-                const apiUrl = `https://api.videodownloaderpro.net/api?url=${encodeURIComponent(url)}`;
-                
-                const response = await fetch(proxyUrl + apiUrl, {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                });
-                
-                if (!response.ok) throw new Error('Ошибка при получении видео');
-                
-                const data = await response.json();
-                
-                if (data.error) throw new Error(data.error);
-                if (!data.videoUrl) throw new Error('Видео не найдено');
-                
-                // Показываем варианты качества, если есть
-                const qualitySelector = document.getElementById('qualitySelector');
-                qualitySelector.innerHTML = '';
-                
-                if (data.formats && data.formats.length > 0) {
-                    data.formats.forEach(format => {
-                        const option = document.createElement('option');
-                        option.value = format.url;
-                        option.textContent = `${format.quality} (${format.format})`;
-                        qualitySelector.appendChild(option);
-                    });
-                } else {
-                    const option = document.createElement('option');
-                    option.value = data.videoUrl;
-                    option.textContent = 'Стандартное качество';
-                    qualitySelector.appendChild(option);
-                }
-                
-                // Показываем видео
-                document.getElementById('videoPlayer').src = data.videoUrl;
-                document.getElementById('resultContainer').style.display = 'block';
-                document.getElementById('statusText').textContent = 'Готово!';
-                
-            } catch (error) {
-                showError(error.message);
-                console.error(error);
-            } finally {
-                document.getElementById('downloadBtn').disabled = false;
-            }
-        });
-        
-        // Save video button
-        document.getElementById('saveBtn').addEventListener('click', () => {
-            const videoUrl = document.getElementById('qualitySelector').value;
-            const fileName = getFileNameFromUrl(videoUrl) || 'video.mp4';
-            
-            const a = document.createElement('a');
-            a.href = videoUrl;
-            a.download = fileName;
-            a.click();
-        });
-        
-        // Helper functions
-        function resetUI() {
-            document.getElementById('errorText').style.display = 'none';
-            document.getElementById('resultContainer').style.display = 'none';
-            document.getElementById('progressBar').value = 0;
-        }
-        
-        function showError(message) {
-            const errorEl = document.getElementById('errorText');
-            errorEl.textContent = message;
-            errorEl.style.display = 'block';
-        }
-        
-        function getFileNameFromUrl(url) {
-            try {
-                const parsed = new URL(url);
-                return parsed.pathname.split('/').pop();
-            } catch {
-                return null;
-            }
+            const frame = document.getElementById('downloaderFrame');
+            frame.src = `https://loader.to/api/card/?url=${encodeURIComponent(url)}`;
         }
     </script>
 </body>
