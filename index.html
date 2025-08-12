@@ -4,76 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#4285f4">
-    <meta name="description" content="Скачивание видео с YouTube, Instagram, Pinterest и других платформ">
     <title>Universal Video Downloader</title>
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
     <style>
         :root {
-            --primary-color: #4285f4;
-            --secondary-color: #34a853;
-            --error-color: #ea4335;
-            --background: #f8f9fa;
-            --card-bg: #ffffff;
-            --text-color: #202124;
-            --border-color: #dadce0;
+            --primary: #4285f4;
+            --error: #ea4335;
+            --success: #34a853;
+            --bg: #f8f9fa;
+            --card: #ffffff;
+            --text: #202124;
         }
-        
         * {
             box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
-        
         body {
-            background-color: var(--background);
-            color: var(--text-color);
-            line-height: 1.6;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
             padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
             max-width: 800px;
             margin: 0 auto;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        .app-container {
-            background-color: var(--card-bg);
+            background: var(--card);
             border-radius: 16px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
             padding: 24px;
-            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
-        
         h1 {
-            color: var(--primary-color);
+            color: var(--primary);
             text-align: center;
             margin-bottom: 24px;
-            font-size: 28px;
-            font-weight: 600;
         }
-        
-        .input-container {
+        .input-group {
             margin-bottom: 20px;
         }
-        
-        .url-input {
+        input {
             width: 100%;
             padding: 14px 16px;
-            border: 1px solid var(--border-color);
+            border: 1px solid #ddd;
             border-radius: 12px;
             font-size: 16px;
             margin-bottom: 12px;
-            transition: border 0.3s;
         }
-        
-        .url-input:focus {
-            border-color: var(--primary-color);
-            outline: none;
-        }
-        
-        .download-btn {
+        button {
             width: 100%;
-            background-color: var(--primary-color);
+            background: var(--primary);
             color: white;
             border: none;
             padding: 14px;
@@ -81,176 +61,115 @@
             font-size: 17px;
             font-weight: 500;
             cursor: pointer;
-            transition: background-color 0.3s;
             margin-bottom: 16px;
         }
-        
-        .download-btn:hover {
-            background-color: #3367d6;
-        }
-        
-        .download-btn:disabled {
-            background-color: #bdc1c6;
+        button:disabled {
+            background: #ccc;
             cursor: not-allowed;
         }
-        
-        .progress-container {
+        .progress {
             margin: 20px 0;
             display: none;
         }
-        
         progress {
             width: 100%;
             height: 8px;
             border-radius: 4px;
-            margin-bottom: 8px;
         }
-        
-        .status-text {
-            font-size: 14px;
-            color: #5f6368;
+        .status {
             text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-top: 8px;
         }
-        
-        .error-text {
-            color: var(--error-color);
+        .error {
+            color: var(--error);
+            text-align: center;
             margin: 12px 0;
-            text-align: center;
-            font-size: 14px;
             display: none;
         }
-        
-        .result-container {
+        .result {
             margin-top: 24px;
             display: none;
         }
-        
-        .video-preview {
+        video {
             width: 100%;
             border-radius: 12px;
             margin-bottom: 16px;
-            background-color: #000;
+            background: #000;
         }
-        
-        .download-result-btn {
-            background-color: var(--secondary-color);
+        .quality-selector {
             width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            border: 1px solid #ddd;
         }
-        
-        .download-result-btn:hover {
-            background-color: #2d9249;
-        }
-        
-        .supported-sites {
-            margin-top: 24px;
-            text-align: center;
-            font-size: 14px;
-            color: #5f6368;
-        }
-        
-        .site-icons {
+        .platforms {
             display: flex;
             justify-content: center;
             gap: 16px;
-            margin-top: 12px;
+            margin-top: 24px;
         }
-        
-        .site-icon {
+        .platform {
             width: 40px;
             height: 40px;
             border-radius: 50%;
             object-fit: cover;
         }
-        
-        @media (max-width: 600px) {
-            body {
-                padding: 12px;
-            }
-            
-            .app-container {
-                padding: 16px;
-            }
-            
-            h1 {
-                font-size: 24px;
-            }
-        }
-        
-        /* PWA install prompt */
-        .install-prompt {
+        .install-btn {
             position: fixed;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: var(--card-bg);
-            padding: 12px 16px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            z-index: 1000;
-            max-width: 90%;
+            background: var(--card);
+            padding: 12px 24px;
+            border-radius: 50px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             display: none;
-        }
-        
-        .install-prompt button {
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            cursor: pointer;
+            z-index: 100;
         }
     </style>
 </head>
 <body>
-    <div class="app-container">
+    <div class="container">
         <h1>Universal Video Downloader</h1>
         
-        <div class="input-container">
-            <input type="url" class="url-input" id="videoUrl" placeholder="Вставьте ссылку на видео" autocomplete="off">
-            <button class="download-btn" id="downloadBtn">Скачать видео</button>
+        <div class="input-group">
+            <input type="url" id="videoUrl" placeholder="Вставьте ссылку на видео (YouTube, Instagram, TikTok и др.)">
+            <button id="downloadBtn">Скачать видео</button>
         </div>
         
-        <div class="error-text" id="errorText"></div>
+        <div class="error" id="errorText"></div>
         
-        <div class="progress-container" id="progressContainer">
-            <progress id="downloadProgress" value="0" max="100"></progress>
-            <div class="status-text" id="statusText">Подготовка к загрузке...</div>
+        <div class="progress" id="progressContainer">
+            <progress id="progressBar" value="0" max="100"></progress>
+            <div class="status" id="statusText">Подготовка...</div>
         </div>
         
-        <div class="result-container" id="resultContainer">
-            <video controls class="video-preview" id="videoPreview"></video>
-            <button class="download-btn download-result-btn" id="downloadResultBtn">Скачать видео</button>
+        <div class="result" id="resultContainer">
+            <video controls id="videoPlayer"></video>
+            <select class="quality-selector" id="qualitySelector"></select>
+            <button id="saveBtn">Сохранить видео</button>
         </div>
         
-        <div class="supported-sites">
-            Поддерживаемые платформы:
-            <div class="site-icons">
-                <img src="https://www.youtube.com/favicon.ico" alt="YouTube" class="site-icon">
-                <img src="https://www.instagram.com/favicon.ico" alt="Instagram" class="site-icon">
-                <img src="https://www.pinterest.com/favicon.ico" alt="Pinterest" class="site-icon">
-            </div>
+        <div class="platforms">
+            <img src="https://www.youtube.com/favicon.ico" class="platform" alt="YouTube">
+            <img src="https://www.instagram.com/favicon.ico" class="platform" alt="Instagram">
+            <img src="https://www.tiktok.com/favicon.ico" class="platform" alt="TikTok">
         </div>
     </div>
     
-    <div class="install-prompt" id="installPrompt">
-        <span>Установить приложение?</span>
-        <button id="installBtn">Установить</button>
-        <button id="cancelInstallBtn">Отмена</button>
-    </div>
+    <button class="install-btn" id="installBtn">Установить приложение</button>
 
     <script>
-        // PWA functionality
+        // PWA Installation
         let deferredPrompt;
         
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            const installPrompt = document.getElementById('installPrompt');
-            installPrompt.style.display = 'flex';
+            document.getElementById('installBtn').style.display = 'block';
         });
         
         document.getElementById('installBtn').addEventListener('click', async () => {
@@ -258,164 +177,114 @@
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
                 if (outcome === 'accepted') {
-                    document.getElementById('installPrompt').style.display = 'none';
+                    document.getElementById('installBtn').style.display = 'none';
                 }
                 deferredPrompt = null;
             }
         });
         
-        document.getElementById('cancelInstallBtn').addEventListener('click', () => {
-            document.getElementById('installPrompt').style.display = 'none';
-        });
-        
-        // Service Worker registration
+        // Service Worker Registration
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js').then(registration => {
-                    console.log('ServiceWorker registration successful');
-                }).catch(err => {
-                    console.log('ServiceWorker registration failed: ', err);
-                });
+                navigator.serviceWorker.register('sw.js')
+                    .then(registration => console.log('SW registered'))
+                    .catch(err => console.log('SW registration failed: ', err));
             });
         }
         
-        // Video download functionality
-        document.getElementById('downloadBtn').addEventListener('click', async function() {
-            const videoUrl = document.getElementById('videoUrl').value.trim();
-            if (!videoUrl) {
-                showError('Пожалуйста, введите URL видео');
+        // Video Download Logic
+        document.getElementById('downloadBtn').addEventListener('click', async () => {
+            const url = document.getElementById('videoUrl').value.trim();
+            if (!url) {
+                showError('Введите URL видео');
                 return;
             }
             
-            const btn = this;
-            const progressContainer = document.getElementById('progressContainer');
-            const progressBar = document.getElementById('downloadProgress');
-            const statusText = document.getElementById('statusText');
-            const errorText = document.getElementById('errorText');
-            const resultContainer = document.getElementById('resultContainer');
-            const videoPreview = document.getElementById('videoPreview');
-            const downloadResultBtn = document.getElementById('downloadResultBtn');
-            
-            // Reset UI
-            btn.disabled = true;
-            errorText.style.display = 'none';
-            progressContainer.style.display = 'block';
-            resultContainer.style.display = 'none';
-            statusText.textContent = 'Определение типа видео...';
-            progressBar.value = 0;
+            resetUI();
+            document.getElementById('downloadBtn').disabled = true;
+            document.getElementById('progressContainer').style.display = 'block';
+            document.getElementById('statusText').textContent = 'Обработка ссылки...';
             
             try {
-                // Check if it's a direct video link
-                if (isDirectVideoLink(videoUrl)) {
-                    await processDirectVideo(videoUrl, progressBar, statusText, videoPreview, downloadResultBtn);
+                // Используем CORS-прокси для обхода ограничений
+                const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+                const apiUrl = `https://api.videodownloaderpro.net/api?url=${encodeURIComponent(url)}`;
+                
+                const response = await fetch(proxyUrl + apiUrl, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                
+                if (!response.ok) throw new Error('Ошибка при получении видео');
+                
+                const data = await response.json();
+                
+                if (data.error) throw new Error(data.error);
+                if (!data.videoUrl) throw new Error('Видео не найдено');
+                
+                // Показываем варианты качества, если есть
+                const qualitySelector = document.getElementById('qualitySelector');
+                qualitySelector.innerHTML = '';
+                
+                if (data.formats && data.formats.length > 0) {
+                    data.formats.forEach(format => {
+                        const option = document.createElement('option');
+                        option.value = format.url;
+                        option.textContent = `${format.quality} (${format.format})`;
+                        qualitySelector.appendChild(option);
+                    });
                 } else {
-                    // For platform links (YouTube, Instagram, etc.)
-                    await processPlatformVideo(videoUrl, progressBar, statusText, videoPreview, downloadResultBtn);
+                    const option = document.createElement('option');
+                    option.value = data.videoUrl;
+                    option.textContent = 'Стандартное качество';
+                    qualitySelector.appendChild(option);
                 }
                 
-                resultContainer.style.display = 'block';
-                statusText.textContent = 'Готово!';
+                // Показываем видео
+                document.getElementById('videoPlayer').src = data.videoUrl;
+                document.getElementById('resultContainer').style.display = 'block';
+                document.getElementById('statusText').textContent = 'Готово!';
+                
             } catch (error) {
-                showError(`Ошибка: ${error.message}`);
+                showError(error.message);
                 console.error(error);
             } finally {
-                btn.disabled = false;
+                document.getElementById('downloadBtn').disabled = false;
             }
         });
         
-        document.getElementById('downloadResultBtn').addEventListener('click', function() {
-            const videoUrl = document.getElementById('videoUrl').value.trim();
-            const videoPreview = document.getElementById('videoPreview');
+        // Save video button
+        document.getElementById('saveBtn').addEventListener('click', () => {
+            const videoUrl = document.getElementById('qualitySelector').value;
+            const fileName = getFileNameFromUrl(videoUrl) || 'video.mp4';
             
-            if (videoPreview.src) {
-                const a = document.createElement('a');
-                a.href = videoPreview.src;
-                a.download = getFilenameFromUrl(videoUrl) || 'video.mp4';
-                a.click();
-            }
+            const a = document.createElement('a');
+            a.href = videoUrl;
+            a.download = fileName;
+            a.click();
         });
         
-        function isDirectVideoLink(url) {
-            return /\.(mp4|webm|mov|mkv|avi|flv|wmv|3gp|m3u8)(\?.*)?$/i.test(url);
-        }
-        
-        async function processDirectVideo(url, progressBar, statusText, videoPreview, downloadBtn) {
-            statusText.textContent = 'Загрузка видео...';
-            
-            const response = await fetch(url);
-            if (!response.ok) throw new Error('Не удалось загрузить видео');
-            
-            const contentLength = response.headers.get('content-length');
-            const reader = response.body.getReader();
-            let receivedLength = 0;
-            let chunks = [];
-            
-            while(true) {
-                const {done, value} = await reader.read();
-                if (done) break;
-                
-                chunks.push(value);
-                receivedLength += value.length;
-                
-                if (contentLength) {
-                    const percent = Math.round((receivedLength / contentLength) * 100);
-                    progressBar.value = percent;
-                    statusText.textContent = `Загружено ${formatBytes(receivedLength)} из ${formatBytes(contentLength)} (${percent}%)`;
-                }
-            }
-            
-            const blob = new Blob(chunks);
-            const videoUrl = URL.createObjectURL(blob);
-            
-            videoPreview.src = videoUrl;
-            downloadBtn.onclick = () => {
-                const a = document.createElement('a');
-                a.href = videoUrl;
-                a.download = getFilenameFromUrl(url) || 'video.mp4';
-                a.click();
-            };
-        }
-        
-        async function processPlatformVideo(url, progressBar, statusText, videoPreview, downloadBtn) {
-            // This is a simplified version - in a real app you'd need a server proxy
-            // or use a service like youtube-dl.wasm
-            
-            statusText.textContent = 'Обработка платформенного видео...';
-            
-            // For demo purposes - in reality you need server-side processing
-            if (url.includes('youtube.com') || url.includes('youtu.be')) {
-                throw new Error('Для YouTube нужен серверный обработчик. Смотрите README на GitHub.');
-            } else if (url.includes('instagram.com')) {
-                throw new Error('Для Instagram нужен серверный обработчик. Смотрите README на GitHub.');
-            } else if (url.includes('pinterest.com')) {
-                throw new Error('Для Pinterest нужен серверный обработчик. Смотрите README на GitHub.');
-            } else {
-                throw new Error('Неподдерживаемая платформа');
-            }
+        // Helper functions
+        function resetUI() {
+            document.getElementById('errorText').style.display = 'none';
+            document.getElementById('resultContainer').style.display = 'none';
+            document.getElementById('progressBar').value = 0;
         }
         
         function showError(message) {
-            const errorText = document.getElementById('errorText');
-            errorText.textContent = message;
-            errorText.style.display = 'block';
+            const errorEl = document.getElementById('errorText');
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
         }
         
-        function getFilenameFromUrl(url) {
+        function getFileNameFromUrl(url) {
             try {
-                const parsedUrl = new URL(url);
-                const pathname = parsedUrl.pathname;
-                return pathname.split('/').pop().split('?')[0].split('#')[0];
+                const parsed = new URL(url);
+                return parsed.pathname.split('/').pop();
             } catch {
                 return null;
             }
-        }
-        
-        function formatBytes(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
     </script>
 </body>
