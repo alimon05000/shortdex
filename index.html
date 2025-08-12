@@ -26,7 +26,7 @@
             color: var(--text-light);
             font-family: 'Montserrat', sans-serif;
             margin: 0;
-            padding: 0;
+            padding: 20px;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -34,10 +34,12 @@
                 radial-gradient(circle at 10% 20%, rgba(0, 136, 255, 0.1) 0%, transparent 20%),
                 radial-gradient(circle at 90% 80%, rgba(255, 0, 255, 0.1) 0%, transparent 20%);
             overflow-x: hidden;
+            box-sizing: border-box;
         }
         
         .container {
             max-width: 800px;
+            width: 100%;
             margin: 2rem auto;
             padding: 2rem;
             background: var(--card-bg);
@@ -50,6 +52,7 @@
             position: relative;
             overflow: hidden;
             z-index: 1;
+            box-sizing: border-box;
         }
         
         .container::before {
@@ -89,6 +92,7 @@
         .input-group {
             margin-bottom: 2rem;
             position: relative;
+            width: 100%;
         }
         
         .url-input {
@@ -100,6 +104,8 @@
             color: white;
             font-size: 1rem;
             transition: all 0.3s;
+            box-sizing: border-box;
+            font-family: inherit;
         }
         
         .url-input:focus {
@@ -127,6 +133,7 @@
             box-shadow: 0 0 15px rgba(0, 136, 255, 0.5);
             position: relative;
             overflow: hidden;
+            font-family: inherit;
         }
         
         .btn::after {
@@ -172,6 +179,7 @@
         .result-container {
             display: none;
             animation: fadeIn 0.5s;
+            width: 100%;
         }
         
         @keyframes fadeIn {
@@ -187,6 +195,7 @@
             overflow: hidden;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
             background: #000;
+            width: 100%;
         }
         
         .video-wrapper video {
@@ -211,6 +220,8 @@
             background-repeat: no-repeat;
             background-position: right 1rem center;
             background-size: 1rem;
+            font-family: inherit;
+            box-sizing: border-box;
         }
         
         .quality-selector:focus {
@@ -225,6 +236,7 @@
             margin: 1rem 0;
             display: none;
             animation: shake 0.5s;
+            width: 100%;
         }
         
         @keyframes shake {
@@ -239,6 +251,7 @@
             gap: 1.5rem;
             margin-top: 2rem;
             flex-wrap: wrap;
+            width: 100%;
         }
         
         .platform-icon {
@@ -271,6 +284,7 @@
             display: none;
             text-align: center;
             margin: 1rem 0;
+            width: 100%;
         }
         
         .loading-spinner {
@@ -290,8 +304,12 @@
         
         /* Мобильная адаптация */
         @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
             .container {
-                margin: 1rem;
+                margin: 1rem auto;
                 padding: 1.5rem;
                 border-radius: 15px;
             }
@@ -340,7 +358,7 @@
         <h1>NEON VIDEO DOWNLOADER</h1>
         
         <div class="input-group">
-            <input type="url" class="url-input" id="videoUrl" placeholder="Вставьте ссылку на YouTube, Instagram, TikTok и др." autocomplete="off">
+            <input type="url" class="url-input" id="videoUrl" placeholder="Вставьте ссылку на YouTube, Instagram, TikTok, Facebook или Twitter" autocomplete="off">
             <button class="btn pulse" id="downloadBtn">СКАЧАТЬ</button>
         </div>
         
@@ -414,6 +432,14 @@
                     return;
                 }
                 
+                // Проверка валидности URL
+                try {
+                    new URL(url);
+                } catch (e) {
+                    showError('Пожалуйста, введите корректный URL');
+                    return;
+                }
+                
                 resetUI();
                 document.getElementById('downloadBtn').disabled = true;
                 document.getElementById('downloadBtn').classList.remove('pulse');
@@ -440,7 +466,7 @@
                     // Показываем результат
                     showResult(videoInfo);
                 } catch (error) {
-                    showError(error.message);
+                    showError(error.message || 'Произошла ошибка при загрузке видео. Попробуйте другую ссылку.');
                     console.error('Ошибка при загрузке видео:', error);
                 } finally {
                     document.getElementById('downloadBtn').disabled = false;
@@ -451,23 +477,26 @@
             
             // Обработчик кнопки сохранения
             document.getElementById('saveBtn').addEventListener('click', () => {
-                const selectedQuality = document.getElementById('qualitySelector').value;
-                const videoUrl = document.getElementById('videoPlayer').src;
+                const qualitySelector = document.getElementById('qualitySelector');
+                const selectedOption = qualitySelector.options[qualitySelector.selectedIndex];
+                const videoUrl = selectedOption.dataset.url;
                 
                 if (videoUrl) {
                     const a = document.createElement('a');
                     a.href = videoUrl;
-                    a.download = `video_${selectedQuality}.mp4`;
+                    a.download = `video_${selectedOption.value}.mp4`;
+                    document.body.appendChild(a);
                     a.click();
+                    document.body.removeChild(a);
                 }
             });
             
             // Обработчик изменения качества
             document.getElementById('qualitySelector').addEventListener('change', function() {
                 const videoPlayer = document.getElementById('videoPlayer');
-                const selectedUrl = this.options[this.selectedIndex].dataset.url;
-                if (selectedUrl) {
-                    videoPlayer.src = selectedUrl;
+                const selectedOption = this.options[this.selectedIndex];
+                if (selectedOption.dataset.url) {
+                    videoPlayer.src = selectedOption.dataset.url;
                 }
             });
         });
@@ -475,157 +504,108 @@
         // Функции для получения видео с разных платформ
         
         async function fetchYouTubeVideo(url) {
-            // Используем прокси для YouTube
-            const proxyUrl = `https://yt-downloader-proxy.herokuapp.com/api/info?url=${encodeURIComponent(url)}`;
+            // Используем публичный API для YouTube
+            const apiUrl = `https://noembed.com/embed?url=${encodeURIComponent(url)}`;
             
-            const response = await fetch(proxyUrl);
+            const response = await fetch(apiUrl);
             if (!response.ok) {
                 throw new Error('Не удалось получить информацию о видео с YouTube');
             }
             
             const data = await response.json();
             
-            // Формируем информацию о видео
-            const videoInfo = {
-                title: data.videoDetails.title,
-                thumbnail: data.videoDetails.thumbnail.thumbnails.pop().url,
-                formats: []
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            
+            // Для YouTube используем iframe, так как прямые ссылки на видео требуют серверной обработки
+            return {
+                title: data.title,
+                thumbnail: data.thumbnail_url,
+                formats: [{
+                    quality: 'Embed',
+                    url: url,
+                    embed: true
+                }]
             };
-            
-            // Фильтруем доступные форматы
-            data.formats.forEach(format => {
-                if (format.mimeType && format.mimeType.includes('video/mp4')) {
-                    videoInfo.formats.push({
-                        quality: format.qualityLabel || `${format.height}p`,
-                        url: format.url,
-                        audio: format.hasAudio
-                    });
-                }
-            });
-            
-            // Сортируем по качеству
-            videoInfo.formats.sort((a, b) => {
-                return parseInt(b.quality) - parseInt(a.quality);
-            });
-            
-            return videoInfo;
         }
         
         async function fetchInstagramVideo(url) {
-            // Используем прокси для Instagram
-            const proxyUrl = `https://api.instagramdownloader.pro/api?url=${encodeURIComponent(url)}`;
+            // Используем публичный сервис для Instagram
+            const apiUrl = `https://api.instagram.com/oembed/?url=${encodeURIComponent(url)}`;
             
-            const response = await fetch(proxyUrl);
+            const response = await fetch(apiUrl);
             if (!response.ok) {
                 throw new Error('Не удалось получить информацию о видео с Instagram');
             }
             
             const data = await response.json();
             
-            if (!data.videoUrl) {
-                throw new Error('Видео не найдено или это не публичный аккаунт');
-            }
-            
+            // Для Instagram также используем iframe
             return {
                 title: 'Instagram Video',
-                thumbnail: data.thumbnail || '',
+                thumbnail: data.thumbnail_url || '',
                 formats: [{
-                    quality: 'HD',
-                    url: data.videoUrl,
-                    audio: true
+                    quality: 'Embed',
+                    url: url,
+                    embed: true
                 }]
             };
         }
         
         async function fetchTikTokVideo(url) {
-            // Используем прокси для TikTok
-            const proxyUrl = `https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`;
+            // Используем публичный сервис для TikTok
+            const apiUrl = `https://www.tiktok.com/oembed?url=${encodeURIComponent(url)}`;
             
-            const response = await fetch(proxyUrl);
+            const response = await fetch(apiUrl);
             if (!response.ok) {
                 throw new Error('Не удалось получить информацию о видео с TikTok');
             }
             
             const data = await response.json();
             
-            if (!data.data || !data.data.play) {
-                throw new Error('Видео не найдено или это не публичный аккаунт');
-            }
-            
             return {
-                title: data.data.title || 'TikTok Video',
-                thumbnail: data.data.cover || '',
+                title: data.title || 'TikTok Video',
+                thumbnail: data.thumbnail_url || '',
                 formats: [{
-                    quality: 'HD',
-                    url: data.data.play,
-                    audio: true
+                    quality: 'Embed',
+                    url: url,
+                    embed: true
                 }]
             };
         }
         
         async function fetchFacebookVideo(url) {
-            // Используем прокси для Facebook
-            const proxyUrl = `https://fbdownloader.net/api/ajaxSearch?url=${encodeURIComponent(url)}`;
-            
-            const response = await fetch(proxyUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                }
-            });
-            
-            if (!response.ok) {
-                throw new Error('Не удалось получить информацию о видео с Facebook');
-            }
-            
-            const data = await response.json();
-            
-            if (!data.links || !data.links.hd) {
-                throw new Error('Видео не найдено или это не публичный аккаунт');
-            }
-            
+            // Для Facebook используем iframe, так как API требует авторизации
             return {
                 title: 'Facebook Video',
-                thumbnail: data.picture || '',
+                thumbnail: '',
                 formats: [{
-                    quality: 'HD',
-                    url: data.links.hd,
-                    audio: true
-                }, {
-                    quality: 'SD',
-                    url: data.links.sd,
-                    audio: true
+                    quality: 'Embed',
+                    url: url,
+                    embed: true
                 }]
             };
         }
         
         async function fetchTwitterVideo(url) {
-            // Используем прокси для Twitter
-            const proxyUrl = `https://twitsave.com/info?url=${encodeURIComponent(url)}`;
+            // Используем публичный сервис для Twitter
+            const apiUrl = `https://publish.twitter.com/oembed?url=${encodeURIComponent(url)}`;
             
-            const response = await fetch(proxyUrl);
+            const response = await fetch(apiUrl);
             if (!response.ok) {
                 throw new Error('Не удалось получить информацию о видео с Twitter');
             }
             
             const data = await response.json();
             
-            if (!data.video || !data.video.length) {
-                throw new Error('Видео не найдено или это не публичный твит');
-            }
-            
-            // Получаем видео с самым высоким качеством
-            const bestQuality = data.video.reduce((prev, current) => {
-                return (prev.quality > current.quality) ? prev : current;
-            });
-            
             return {
-                title: 'Twitter Video',
-                thumbnail: data.thumbnail || '',
+                title: data.author_name || 'Twitter Video',
+                thumbnail: '',
                 formats: [{
-                    quality: bestQuality.quality + 'p',
-                    url: bestQuality.url,
-                    audio: true
+                    quality: 'Embed',
+                    url: url,
+                    embed: true
                 }]
             };
         }
@@ -635,23 +615,79 @@
             const videoPlayer = document.getElementById('videoPlayer');
             const qualitySelector = document.getElementById('qualitySelector');
             
-            // Устанавливаем видео
-            const bestQuality = videoInfo.formats[0];
-            videoPlayer.src = bestQuality.url;
-            videoPlayer.poster = videoInfo.thumbnail;
-            
-            // Заполняем варианты качества
+            // Очищаем предыдущие варианты
             qualitySelector.innerHTML = '';
+            
+            // Добавляем варианты качества
             videoInfo.formats.forEach((format, index) => {
                 const option = document.createElement('option');
                 option.value = format.quality;
-                option.textContent = `${format.quality}${format.audio ? '' : ' (без звука)'}`;
+                option.textContent = format.quality + (format.embed ? ' (встроенное)' : '');
                 option.dataset.url = format.url;
                 if (index === 0) option.selected = true;
                 qualitySelector.appendChild(option);
             });
             
+            // Устанавливаем видео или iframe
+            const selectedFormat = videoInfo.formats[0];
+            if (selectedFormat.embed) {
+                // Для встроенного видео используем iframe
+                videoPlayer.style.display = 'none';
+                
+                // Создаем iframe если его нет
+                let iframe = videoPlayer.nextElementSibling;
+                if (!iframe || !iframe.classList.contains('video-iframe')) {
+                    iframe = document.createElement('iframe');
+                    iframe.classList.add('video-iframe');
+                    iframe.setAttribute('allowfullscreen', '');
+                    iframe.style.position = 'absolute';
+                    iframe.style.top = '0';
+                    iframe.style.left = '0';
+                    iframe.style.width = '100%';
+                    iframe.style.height = '100%';
+                    iframe.style.border = 'none';
+                    videoPlayer.parentNode.appendChild(iframe);
+                }
+                
+                // Устанавливаем src для iframe в зависимости от платформы
+                if (selectedFormat.url.includes('youtube.com') || selectedFormat.url.includes('youtu.be')) {
+                    const videoId = getYouTubeId(selectedFormat.url);
+                    iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+                } else if (selectedFormat.url.includes('instagram.com')) {
+                    iframe.src = selectedFormat.url + 'embed';
+                } else if (selectedFormat.url.includes('tiktok.com')) {
+                    iframe.src = `https://www.tiktok.com/embed/v2/${getTikTokId(selectedFormat.url)}`;
+                } else if (selectedFormat.url.includes('facebook.com')) {
+                    iframe.src = `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(selectedFormat.url)}`;
+                } else if (selectedFormat.url.includes('twitter.com') || selectedFormat.url.includes('x.com')) {
+                    iframe.src = `https://twitframe.com/show?url=${encodeURIComponent(selectedFormat.url)}`;
+                }
+            } else {
+                // Для прямых ссылок используем video элемент
+                const iframe = videoPlayer.nextElementSibling;
+                if (iframe && iframe.classList.contains('video-iframe')) {
+                    iframe.style.display = 'none';
+                }
+                videoPlayer.style.display = 'block';
+                videoPlayer.src = selectedFormat.url;
+                if (videoInfo.thumbnail) {
+                    videoPlayer.poster = videoInfo.thumbnail;
+                }
+            }
+            
             resultContainer.style.display = 'block';
+        }
+        
+        function getYouTubeId(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+        
+        function getTikTokId(url) {
+            const regExp = /\/video\/(\d+)/;
+            const match = url.match(regExp);
+            return match ? match[1] : null;
         }
         
         function resetUI() {
